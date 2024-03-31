@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_firebase_admin/dart_firebase_admin.dart';
 import 'package:dart_firebase_admin/firestore.dart';
@@ -8,15 +9,25 @@ import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_runner/src/features/job/domain/job_data.dart';
 import 'package:openci_runner/src/features/runner/android/controller/android_job_controller.dart';
 import 'package:openci_runner/src/features/runner/ios_job_controller.dart';
-import 'package:openci_runner/src/features/runner/runner_arguments.dart';
-import 'package:openci_runner/src/features/runner/runner_controller.dart';
 import 'package:openci_runner/src/features/user/domain/user_data.dart';
 import 'package:openci_runner/src/features/vm/controller/vm_controller.dart';
 import 'package:openci_runner/src/services/ssh/ssh_service.dart';
 import 'package:openci_runner/src/utilities/future_delayed.dart';
 import 'package:openci_runner/src/utilities/github/github_service.dart';
 import 'package:process_run/shell.dart';
+import 'package:sentry/sentry.dart';
 import 'package:uuid/uuid.dart';
+
+class AppConfig {
+  AppConfig({
+    required this.firebaseProjectName,
+    required this.firebaseServiceAccountJson,
+    this.firestoreDatabaseId,
+  });
+  final String firebaseProjectName;
+  final String firebaseServiceAccountJson;
+  final String? firestoreDatabaseId;
+}
 
 const checks = '''
 job is null, waiting 10 seconds for next check.
@@ -32,18 +43,71 @@ class RunnerCommand extends Command<int> {
     required Logger logger,
   }) : _logger = logger {
     argParser
-      ..addFlag(
+      ..addOption(
         'firebaseProjectName',
         help: 'Firebase Project Name',
         abbr: 'p',
-        negatable: false,
       )
-      ..addFlag(
+      ..addOption(
         'firebaseServiceAccountJson',
         help: 'Firebase Service Account Json file Path',
         abbr: 's',
-        negatable: false,
+      )
+      ..addOption(
+        'sentryDSN',
+        help: "Sentry's DSN",
+        abbr: 'd',
+      )
+      ..addOption(
+        'firestoreDatabaseId',
+        help: 'firebase project id',
+        abbr: 'i',
       );
+  }
+
+  Future<AppConfig> initializeApp(ArgResults? argResults) async {
+    if (argResults == null) {
+      throw Exception('ArgResults is null');
+    }
+    final firebaseProjectName = argResults['firebaseProjectName'] as String;
+    final firebaseServiceAccountJson =
+        argResults['firebaseServiceAccountJson'] as String;
+    final sentryDSN = argResults['sentryDSN'] as String?;
+    final firestoreDatabaseId = argResults['firestoreDatabaseId'] as String?;
+
+    await initializeSentry(sentryDSN);
+    validateFirebaseProjectName(firebaseProjectName);
+    validateFirebaseServiceAccountJson(firebaseServiceAccountJson);
+
+    return AppConfig(
+      firebaseProjectName: firebaseProjectName,
+      firebaseServiceAccountJson: firebaseServiceAccountJson,
+      firestoreDatabaseId: firestoreDatabaseId,
+    );
+  }
+
+  Future<void> initializeSentry(String? sentryDSN) async {
+    if (sentryDSN != null) {
+      await Sentry.init((options) {
+        options
+          ..dsn = sentryDSN
+          ..tracesSampleRate = 1.0;
+      });
+    }
+  }
+
+  void validateFirebaseProjectName(String firebaseProjectName) {
+    if (firebaseProjectName.isEmpty) {
+      _logger.err('firebaseProjectName is required');
+      throw Exception('firebaseProjectName is required');
+    }
+  }
+
+  void validateFirebaseServiceAccountJson(String firebaseServiceAccountJson) {
+    if (firebaseServiceAccountJson.isEmpty) {
+      _logger.err('firebaseServiceAccountJson is required');
+      throw Exception('firebaseServiceAccountJson is required');
+    }
   }
 
   @override
@@ -56,25 +120,21 @@ class RunnerCommand extends Command<int> {
 
   @override
   Future<int> run() async {
-    final controller = RunnerController(_logger, argResults)
-      ..checkArgument(RunnerArguments.firebaseProjectName);
-
-    final arguments = controller.doesArgumentsExist();
-    final firebaseProjectName = arguments[1];
-    final serviceAccountJsonPath = arguments[3];
-
+    final appConfig = await initializeApp(argResults);
     _logger.success('Argument check passed.');
 
     final admin = FirebaseAdminApp.initializeApp(
-      firebaseProjectName,
+      appConfig.firebaseProjectName,
       Credential.fromServiceAccount(
-        File(serviceAccountJsonPath),
+        File(appConfig.firebaseServiceAccountJson),
       ),
     );
 
     final firestore = Firestore(
       admin,
-      // settings: Settings(databaseId: 'develop'),
+      settings: Settings(
+        databaseId: appConfig.firestoreDatabaseId == null ? null : 'develop',
+      ),
     );
 
     var isSearching = false;
@@ -88,6 +148,7 @@ class RunnerCommand extends Command<int> {
     ProcessSignal.sigint.watch().listen((signal) {
       _logger.warn('Received SIGINT. Terminating the CLI...');
       shouldExit = true;
+      exit(0);
     });
 
     while (!shouldExit) {
