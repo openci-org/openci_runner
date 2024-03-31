@@ -1,3 +1,7 @@
+## 0.6.7
+
+- feat: aut-reboot ([#111](https://github.com/open-ci-io/openci_runner/issues/111))
+
 ## 0.6.6
 
 - feat: delete unused tart VM ([#120](https://github.com/open-ci-io/openci_runner/issues/120))
