@@ -1,3 +1,7 @@
+## 0.6.8
+
+- feat: sentry ([#124](https://github.com/open-ci-io/openci_runner/issues/124))
+
 ## 0.6.7
 
 - feat: aut-reboot ([#111](https://github.com/open-ci-io/openci_runner/issues/111))
