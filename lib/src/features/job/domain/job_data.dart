@@ -11,8 +11,6 @@ class JobData with _$JobData {
     required String githubRepositoryUrl,
     required String baseBranch,
     required String githubPAT,
-
-    ///
     required TargetPlatform platform,
     required String userId,
   }) = _JobData;

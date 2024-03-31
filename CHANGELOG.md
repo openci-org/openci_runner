@@ -1,3 +1,7 @@
+## 0.6.6
+
+- feat: delete unused tart VM ([#120](https://github.com/open-ci-io/openci_runner/issues/120))
+
 ## 0.6.5
 
 - fix: Remove wait 20 seconds for vm start ([#77](https://github.com/open-ci-io/openci_runner/issues/77))

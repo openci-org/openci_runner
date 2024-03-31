@@ -25,8 +25,6 @@ mixin _$JobData {
   String get githubRepositoryUrl => throw _privateConstructorUsedError;
   String get baseBranch => throw _privateConstructorUsedError;
   String get githubPAT => throw _privateConstructorUsedError;
-
-  ///
   TargetPlatform get platform => throw _privateConstructorUsedError;
   String get userId => throw _privateConstructorUsedError;
 
@@ -198,8 +196,6 @@ class _$JobDataImpl implements _JobData {
   final String baseBranch;
   @override
   final String githubPAT;
-
-  ///
   @override
   final TargetPlatform platform;
   @override
@@ -272,8 +268,6 @@ abstract class _JobData implements JobData {
   @override
   String get githubPAT;
   @override
-
-  ///
   TargetPlatform get platform;
   @override
   String get userId;
