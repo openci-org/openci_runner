@@ -1,6 +1,29 @@
 ## 0.6.8
 
-- feat: sentry ([#124](https://github.com/open-ci-io/openci_runner/issues/124))
+- close #124 
+
+This pull request introduces a new feature to the `openci_runner` project: the integration of Sentry for error tracking. The changes are mostly concentrated in the `runner_command.dart` file, where the command-line arguments have been updated to include Sentry's DSN and Firestore's database ID. The `CHANGELOG.md` and `pubspec.yaml` files have also been updated to reflect the new version and the addition of the Sentry package.
+
+Main changes:
+
+* [`CHANGELOG.md`](diffhunk://#diff-06572a96a58dc510037d5efa622f9bec8519bc1beab13c9f251e97e657a9d4edR1-R4): Updated the changelog with the new version (0.6.8) and the addition of the Sentry feature.
+
+Updates to `lib/src/features/runner/runner_command.dart`:
+
+* Introduced a new `AppConfig` class that includes the Firebase project name, Firebase service account JSON, Firestore database ID, and Sentry DSN.
+* Updated the `RunnerCommand` class to replace flags with options for the Firebase project name and service account JSON. Also added options for the Sentry DSN and Firestore database ID.
+* Added a new `initializeApp` method to validate and initialize the application configuration.
+* Refactored the `run` method to use the new `AppConfig` class and initialize the Firebase Admin App and Firestore with the new configuration.
+* Added a process exit when the SIGINT signal is received.
+
+Removals:
+
+* [`lib/src/features/runner/runner_controller.dart`](diffhunk://#diff-05591da6f8536c76638426faef6bca0e0ef2a059ec5b194d564e5eb6f37515ecL1-L26): Removed the `RunnerController` class as it is no longer needed after the refactoring in `runner_command.dart`.
+
+Updates to `pubspec.yaml`:
+
+* Updated the version of the `openci_runner` package to 0.6.8.
+* Added the Sentry package to the dependencies.
 
 ## 0.6.7
 
