@@ -56,6 +56,7 @@ class RunnerCommand extends Command<int> {
   Future<int> run() async {
     final controller = RunnerController(_logger, argResults)
       ..checkArgument(RunnerArguments.firebaseProjectName);
+
     final arguments = controller.doesArgumentsExist();
     final firebaseProjectName = arguments[1];
     final serviceAccountJsonPath = arguments[3];
@@ -69,7 +70,10 @@ class RunnerCommand extends Command<int> {
       ),
     );
 
-    final firestore = Firestore(admin);
+    final firestore = Firestore(
+      admin,
+      // settings: Settings(databaseId: 'develop'),
+    );
 
     var isSearching = false;
 
@@ -111,14 +115,14 @@ class RunnerCommand extends Command<int> {
           await firestore.collection('users').doc(jobData.userId).get();
 
       if (userDocs.exists == false) {
-        _logger.info(checks);
+        _logger.warn('UserDocs does not exist.');
         await wait();
         continue;
       }
 
       final userData = userDocs.data();
       if (userData == null) {
-        _logger.info(checks);
+        _logger.warn('UserData is null');
         await wait();
         continue;
       }
@@ -146,6 +150,7 @@ class RunnerCommand extends Command<int> {
       if (Platform.isMacOS) {
         final vmId = const Uuid().v4();
         final vm = VMController(vmId);
+        await vm.cleanupVMs;
         await vm.cloneVM;
         unawaited(vm.launchVM);
         while (true) {

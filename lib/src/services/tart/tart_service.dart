@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_runner/src/services/shell/shell_service.dart';
+import 'package:process_run/shell.dart' as process_run;
 
 class TartService {
   TartService();
@@ -24,4 +27,7 @@ class TartService {
       _runShell('tart clone $baseVMName $newVMName');
 
   Future<String> ip(String vmName) => _runShell('tart ip $vmName');
+
+  Future<List<ProcessResult>> tartList() async =>
+      process_run.run('tart list', verbose: false);
 }
