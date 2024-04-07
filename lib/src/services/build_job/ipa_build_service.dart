@@ -7,11 +7,6 @@ class IpaBuildService {
   IpaBuildService(this._sshShellService);
   final SSHShellService _sshShellService;
 
-  // if (await iosJobController.importServiceAccountJson == false) {
-  //   _logger.err('import service account json failed');
-  //   continue;
-  // }
-
   // if (await iosJobController.importAdhocExportOptionsPlist == false) {
   //   _logger.err('importAdhocExportOptionsPlist failed');
   //   continue;

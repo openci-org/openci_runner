@@ -9,23 +9,22 @@ import 'package:dart_firebase_admin/firestore.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:mason_logger/mason_logger.dart';
-import 'package:openci_runner/src/services/build_job/build_utility_service.dart';
-import 'package:openci_runner/src/services/build_job/workflow/workflow_model.dart';
-import 'package:openci_runner/src/services/firebase/firestore/firestore_path.dart';
-import 'package:openci_runner/src/services/log/log_service.dart';
-import 'package:openci_runner/src/services/shell/local_shell_service.dart';
-import 'package:openci_runner/src/services/shell/ssh_shell_service.dart';
-import 'package:openci_runner/src/services/tart/tart_service.dart';
-import 'package:openci_runner/src/services/uuid/uuid_service.dart';
-import 'package:openci_runner/src/services/vm_service.dart';
 import 'package:process_run/shell.dart';
 import 'package:sentry/sentry.dart';
 
 import 'package:openci_runner/src/features/job/domain/job_data.dart';
 import 'package:openci_runner/src/features/job/domain/job_data_v2.dart';
 import 'package:openci_runner/src/features/vm/controller/vm_controller.dart';
+import 'package:openci_runner/src/services/build_job/build_utility_service.dart';
+import 'package:openci_runner/src/services/build_job/workflow/workflow_model.dart';
+import 'package:openci_runner/src/services/firebase/firestore/firestore_path.dart';
+import 'package:openci_runner/src/services/log/log_service.dart';
+import 'package:openci_runner/src/services/shell/local_shell_service.dart';
+import 'package:openci_runner/src/services/shell/ssh_shell_service.dart';
 import 'package:openci_runner/src/services/ssh/ssh_service.dart';
-import 'package:openci_runner/src/utilities/process_runner.dart';
+import 'package:openci_runner/src/services/tart/tart_service.dart';
+import 'package:openci_runner/src/services/uuid/uuid_service.dart';
+import 'package:openci_runner/src/services/vm_service.dart';
 
 Future<String> getInstallationToken(
   int appId,
@@ -152,8 +151,6 @@ class RunnerCommand extends Command<int> {
   @override
   Future<int> run() async {
     GetIt.instance.registerSingleton<Logger>(Logger());
-    GetIt.instance.registerSingleton<ProcessRunner>(ProcessRunner());
-    final processRunner = ProcessRunner();
 
     final appConfig = await initializeApp(argResults);
     _logger.success('Argument check passed.');
