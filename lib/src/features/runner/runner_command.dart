@@ -1,40 +1,71 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_firebase_admin/dart_firebase_admin.dart';
 import 'package:dart_firebase_admin/firestore.dart';
+import 'package:get_it/get_it.dart';
+import 'package:http/http.dart' as http;
 import 'package:mason_logger/mason_logger.dart';
-import 'package:openci_runner/src/features/job/domain/job_data.dart';
-import 'package:openci_runner/src/features/runner/android/controller/android_job_controller.dart';
-import 'package:openci_runner/src/features/runner/ios_job_controller.dart';
-import 'package:openci_runner/src/features/user/domain/user_data.dart';
-import 'package:openci_runner/src/features/vm/controller/vm_controller.dart';
-import 'package:openci_runner/src/services/ssh/ssh_service.dart';
-import 'package:openci_runner/src/utilities/future_delayed.dart';
-import 'package:openci_runner/src/utilities/github/github_service.dart';
+import 'package:openci_runner/src/services/build_job/build_utility_service.dart';
+import 'package:openci_runner/src/services/build_job/workflow/workflow_model.dart';
+import 'package:openci_runner/src/services/firebase/firestore/firestore_path.dart';
+import 'package:openci_runner/src/services/log/log_service.dart';
+import 'package:openci_runner/src/services/shell/local_shell_service.dart';
+import 'package:openci_runner/src/services/shell/ssh_shell_service.dart';
+import 'package:openci_runner/src/services/tart/tart_service.dart';
+import 'package:openci_runner/src/services/uuid/uuid_service.dart';
+import 'package:openci_runner/src/services/vm_service.dart';
 import 'package:process_run/shell.dart';
 import 'package:sentry/sentry.dart';
-import 'package:uuid/uuid.dart';
+
+import 'package:openci_runner/src/features/job/domain/job_data.dart';
+import 'package:openci_runner/src/features/job/domain/job_data_v2.dart';
+import 'package:openci_runner/src/features/vm/controller/vm_controller.dart';
+import 'package:openci_runner/src/services/ssh/ssh_service.dart';
+import 'package:openci_runner/src/utilities/process_runner.dart';
+
+Future<String> getInstallationToken(
+  int appId,
+  String privateKey,
+  int installationId,
+) async {
+  const url = 'https://getinstallationtoken-wvluvdjkzq-uc.a.run.app';
+
+  final response = await http.post(
+    Uri.parse(url),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'appId': appId,
+      'privateKey': privateKey,
+      'installationId': installationId,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    return data['installationToken'] as String;
+  } else {
+    throw Exception(
+      'Failed to get installation token. Status code: ${response.statusCode}',
+    );
+  }
+}
 
 class AppConfig {
   AppConfig({
     required this.firebaseProjectName,
     required this.firebaseServiceAccountJson,
-    this.firestoreDatabaseId,
+    required this.pem,
   });
   final String firebaseProjectName;
   final String firebaseServiceAccountJson;
-  final String? firestoreDatabaseId;
+  final String pem;
 }
 
-const checks = '''
-job is null, waiting 10 seconds for next check.
-Jobがありません。10秒後に再確認します。
-''';
-
-const jobsPath = 'jobs_v2';
+const jobsPath = 'jobs_v3';
 
 bool shouldExit = false;
 
@@ -59,9 +90,9 @@ class RunnerCommand extends Command<int> {
         abbr: 'd',
       )
       ..addOption(
-        'firestoreDatabaseId',
-        help: 'firebase project id',
-        abbr: 'i',
+        'pemFilePath',
+        help: 'pem file path',
+        abbr: 'f',
       );
   }
 
@@ -73,7 +104,7 @@ class RunnerCommand extends Command<int> {
     final firebaseServiceAccountJson =
         argResults['firebaseServiceAccountJson'] as String;
     final sentryDSN = argResults['sentryDSN'] as String?;
-    final firestoreDatabaseId = argResults['firestoreDatabaseId'] as String?;
+    final pem = argResults['pemFilePath'] as String;
 
     await initializeSentry(sentryDSN);
     validateFirebaseProjectName(firebaseProjectName);
@@ -82,7 +113,7 @@ class RunnerCommand extends Command<int> {
     return AppConfig(
       firebaseProjectName: firebaseProjectName,
       firebaseServiceAccountJson: firebaseServiceAccountJson,
-      firestoreDatabaseId: firestoreDatabaseId,
+      pem: pem,
     );
   }
 
@@ -120,6 +151,10 @@ class RunnerCommand extends Command<int> {
 
   @override
   Future<int> run() async {
+    GetIt.instance.registerSingleton<Logger>(Logger());
+    GetIt.instance.registerSingleton<ProcessRunner>(ProcessRunner());
+    final processRunner = ProcessRunner();
+
     final appConfig = await initializeApp(argResults);
     _logger.success('Argument check passed.');
 
@@ -132,9 +167,6 @@ class RunnerCommand extends Command<int> {
 
     final firestore = Firestore(
       admin,
-      settings: Settings(
-        databaseId: appConfig.firestoreDatabaseId == null ? null : 'develop',
-      ),
     );
 
     var isSearching = false;
@@ -162,9 +194,10 @@ class RunnerCommand extends Command<int> {
 
         final jobsQs = await firestore
             .collection(jobsPath)
-            .where('processing', WhereFilter.equal, false)
-            .where('success', WhereFilter.equal, false)
-            .where('failure', WhereFilter.equal, false)
+            .where('buildStatus.processing', WhereFilter.equal, false)
+            .where('buildStatus.success', WhereFilter.equal, false)
+            .where('buildStatus.failure', WhereFilter.equal, false)
+            .orderBy('createdAt', descending: true)
             .get();
 
         if (jobsQs.docs.isEmpty && progress != null) {
@@ -173,251 +206,236 @@ class RunnerCommand extends Command<int> {
           await Future<void>.delayed(const Duration(seconds: 10));
           continue;
         }
+
         progress!.complete('New job found');
         isSearching = false;
         final jobsData = jobsQs.docs.first.data();
-        final jobData = JobData.fromJson(jobsData);
-        final targetPlatform = jobData.platform;
+        final buildJob = BuildModel.fromJson(jobsData);
+        final jobId = buildJob.documentId;
+        final targetPlatform = buildJob.platform;
         _logger.info('targetPlatform: $targetPlatform');
 
-        await firestore.collection(jobsPath).doc(jobData.documentId).update({
-          'processing': true,
-        });
-
-        final userDocs =
-            await firestore.collection('users').doc(jobData.userId).get();
-
-        if (userDocs.exists == false) {
-          _logger.warn('UserDocs does not exist.');
-          await wait();
-          continue;
-        }
-
-        final userData = userDocs.data();
-        if (userData == null) {
-          _logger.warn('UserData is null');
-          await wait();
-          continue;
-        }
-        final user = UserData.fromJson(userData);
-
-        final distributionQs = await firestore
-            .collection('users')
-            .doc(user.userId)
-            .collection('distribution')
-            .where('platform', WhereFilter.equal, targetPlatform.name)
+        final workflowDocs = await firestore
+            .collection(FirestorePath.workflowDomain)
+            .doc(buildJob.workflowId)
             .get();
 
-        if (distributionQs.docs.isEmpty) {
-          _logger.info(checks);
-          await wait();
-          continue;
+        final workflowData = workflowDocs.data();
+        if (workflowData == null) {
+          throw Exception('Workflow data is null for job: $jobId');
         }
-        final distributionList = distributionQs.docs.map((e) {
-          final data = e.data();
-          return Distribution.fromJson(data);
-        }).toList();
+        final workflow = WorkflowModel.fromJson(workflowData);
 
-        final distribution = distributionList.first;
+        // prepare service classes
+        final localShellService = LocalShellService();
+        final tartService = TartService(localShellService);
+        final vmService = VMService(tartService);
+        final buildUtilityService = BuildUtilityService(firestore, vmService);
 
-        if (Platform.isMacOS) {
-          final vmId = const Uuid().v4();
-          final vm = VMController(vmId);
-          await vm.cleanupVMs;
-          await vm.cloneVM;
-          unawaited(vm.launchVM);
-          while (true) {
-            final shell = Shell();
-            List<ProcessResult>? result;
-            try {
-              result = await shell.run('tart ip $vmId');
-            } catch (e) {
-              result = null;
-            }
-            if (result != null) {
-              break;
-            }
-            await Future<void>.delayed(const Duration(seconds: 1));
+        await buildUtilityService.markBuildAsStarted(jobId);
+
+        final privateKeyFile = File(appConfig.pem);
+        final privateKey = await privateKeyFile.readAsString();
+
+        final tokenId = await getInstallationToken(
+          buildJob.github.appId,
+          privateKey,
+          buildJob.github.installationId,
+        );
+
+        final vmId = UuidService.generateV4();
+        final vm = VMController(vmId, tartService);
+        await vm.cleanupVMs;
+        await vm.cloneVM;
+        unawaited(vm.launchVM);
+        while (true) {
+          final shell = Shell();
+          List<ProcessResult>? result;
+          try {
+            result = await shell.run('tart ip $vmId');
+          } catch (e) {
+            result = null;
           }
-          _logger.success('VM is ready');
-          final vmIP = await vm.fetchIpAddress;
-          final ssh = SSHService();
-
-          final sshClient = await ssh.sshToServer(vmIP);
-          if (sshClient == null) {
-            throw Exception('ssh client is null');
+          if (result != null) {
+            break;
           }
-          if (targetPlatform == TargetPlatform.android) {
-            final androidJobController = AndroidJobController(
-              sshService: ssh,
-              sshClient: sshClient,
-              userData: user,
-              jobData: jobData,
-              gitHubService: GitHubService(),
-              firestore: firestore,
-              distribution: distribution,
-              vmController: vm,
-            );
-
-            if (await androidJobController.cloneRepository == false) {
-              _logger.err('clone repository failed');
-              continue;
-            }
-
-            if (await androidJobController.importServiceAccountJson == false) {
-              _logger.err('import service account json failed');
-              continue;
-            }
-
-            if (await androidJobController.importKeyJks == false) {
-              _logger.err('import key jks failed');
-              continue;
-            }
-
-            if (await androidJobController.importKeyProperties == false) {
-              _logger.err('import key properties failed');
-              continue;
-            }
-
-            if (await androidJobController.changeFlutterVersion == false) {
-              _logger.err('changeFlutterVersion failed');
-              continue;
-            }
-
-            if (await androidJobController.checkFlutterVersion == false) {
-              _logger.err('checkFlutterVersion failed');
-              continue;
-            }
-
-            if (await androidJobController.flutterClean == false) {
-              _logger.err('flutter clean failed');
-              continue;
-            }
-
-            if (await androidJobController.buildApk == false) {
-              _logger.err('build apk failed');
-              continue;
-            }
-
-            if (await androidJobController.uploadApkToFAD == false) {
-              _logger.err('upload apk failed');
-              continue;
-            }
-
-            await firestore
-                .collection('users')
-                .doc(user.userId)
-                .update({'androidBuildNumber': user.androidBuildNumber + 1});
-
-            await firestore
-                .collection(jobsPath)
-                .doc(jobData.documentId)
-                .update({'success': true});
-
-            _logger.success('build success');
-
-            await vm.stopVM;
-          } else if (targetPlatform == TargetPlatform.ios) {
-            final iosJobController = IosJobController(
-              sshService: ssh,
-              sshClient: sshClient,
-              userData: user,
-              jobData: jobData,
-              gitHubService: GitHubService(),
-              firestore: firestore,
-              distribution: distribution,
-              vmController: vm,
-            );
-
-            if (user.buildCertificateBase64 == null ||
-                user.exportOptionsAdhoc == null ||
-                user.buildProvisioningProfileBase64 == null) {
-              _logger.err('ios setup has not been finished');
-              await firestore
-                  .collection(jobsPath)
-                  .doc(jobData.documentId)
-                  .update({
-                'failure': true,
-              });
-              continue;
-            }
-
-            if (await iosJobController.cloneRepository == false) {
-              _logger.err('clone repository failed');
-              continue;
-            }
-
-            if (await iosJobController.importServiceAccountJson == false) {
-              _logger.err('import service account json failed');
-              continue;
-            }
-
-            if (await iosJobController.importAdhocExportOptionsPlist == false) {
-              _logger.err('importAdhocExportOptionsPlist failed');
-              continue;
-            }
-
-            if (await iosJobController.createAdhocCertificates == false) {
-              _logger.err('createAdhocCertificates failed');
-              continue;
-            }
-
-            if (await iosJobController.createAdhocMobileProvisioningProfile ==
-                false) {
-              _logger.err('createAdhocMobileProvisioningProfile failed');
-              continue;
-            }
-
-            if (await iosJobController.importCertificates == false) {
-              _logger.err('importCertificates failed');
-              continue;
-            }
-            if (await iosJobController.importP8 == false) {
-              _logger.err('importP8 failed');
-              continue;
-            }
-
-            if (await iosJobController.runCustomScript == false) {
-              _logger.err('runCustomScript failed');
-              continue;
-            }
-
-            if (await iosJobController.buildIpa == false) {
-              _logger.err('buildIpa failed');
-              continue;
-            }
-
-            if (distribution.distribution == 'fad') {
-              if (await iosJobController.uploadIpaToFAD == false) {
-                _logger.err('uploadIpaToFAD failed');
-                continue;
-              }
-            }
-
-            if (distribution.distribution == 'testFlight') {
-              if (await iosJobController.uploadIpaToTestFlight == false) {
-                _logger.err('uploadIpaToTestFlight failed');
-                continue;
-              }
-            }
-
-            await firestore
-                .collection('users')
-                .doc(user.userId)
-                .update({'iosBuildNumber': user.iosBuildNumber + 1});
-
-            await firestore
-                .collection(jobsPath)
-                .doc(jobData.documentId)
-                .update({'success': true});
-
-            _logger.success('build success');
-
-            await vm.stopVM;
-          }
+          await Future<void>.delayed(const Duration(seconds: 1));
         }
-      } catch (e) {
-        _logger.warn('CLI crashed: $e');
+        _logger.success('VM is ready');
+        final vmIP = await vm.fetchIpAddress;
+        final logService = LogService(firestore);
+
+        final sshService = SSHService(logService, buildUtilityService);
+
+        final sshClient = await sshService.sshToServer(vmIP);
+        if (sshClient == null) {
+          throw Exception('ssh client is null');
+        }
+        final sshShellService = SSHShellService(sshService);
+
+        if (targetPlatform == TargetPlatform.android) {
+          // final androidJobController = AndroidJobController(
+          //   sshService: ssh,
+          //   sshClient: sshClient,
+          //   gitHubService: GitHubService(),
+          //   firestore: firestore,
+          //   vmController: vm,
+          // );
+
+          // if (await androidJobController.cloneRepository == false) {
+          //   _logger.err('clone repository failed');
+          //   continue;
+          // }
+
+          // if (await androidJobController.importServiceAccountJson == false) {
+          //   _logger.err('import service account json failed');
+          //   continue;
+          // }
+
+          // if (await androidJobController.importKeyJks == false) {
+          //   _logger.err('import key jks failed');
+          //   continue;
+          // }
+
+          // if (await androidJobController.importKeyProperties == false) {
+          //   _logger.err('import key properties failed');
+          //   continue;
+          // }
+
+          // if (await androidJobController.changeFlutterVersion == false) {
+          //   _logger.err('changeFlutterVersion failed');
+          //   continue;
+          // }
+
+          // if (await androidJobController.checkFlutterVersion == false) {
+          //   _logger.err('checkFlutterVersion failed');
+          //   continue;
+          // }
+
+          // if (await androidJobController.flutterClean == false) {
+          //   _logger.err('flutter clean failed');
+          //   continue;
+          // }
+
+          // if (await androidJobController.buildApk == false) {
+          //   _logger.err('build apk failed');
+          //   continue;
+          // }
+
+          // if (await androidJobController.uploadApkToFAD == false) {
+          //   _logger.err('upload apk failed');
+          //   continue;
+          // }
+
+          // await firestore
+          //     .collection('users')
+          //     .doc(user.userId)
+          //     .update({'androidBuildNumber': user.androidBuildNumber + 1});
+
+          // await firestore
+          //     .collection(jobsPath)
+          //     .doc(job.documentId)
+          //     .update({'success': true});
+
+          // _logger.success('build success');
+
+          // await vm.stopVM;
+        } else if (targetPlatform == TargetPlatform.ios) {
+          await buildUtilityService.cloneRepository(
+            sshShellService,
+            sshClient,
+            buildJob,
+            jobId,
+            vm.workingVMName,
+            tokenId,
+          );
+          final serviceAccountJsonDownloadUrl =
+              workflow.firebase.serviceAccountJson;
+
+          if (serviceAccountJsonDownloadUrl != null) {
+            await buildUtilityService.importServiceAccountJson(
+              appConfig.firebaseServiceAccountJson,
+              sshShellService,
+              sshClient,
+              jobId,
+              vm.workingVMName,
+              buildJob.github.repositoryName,
+              serviceAccountJsonDownloadUrl,
+            );
+          }
+
+          // if (await iosJobController.importAdhocExportOptionsPlist == false) {
+          //   _logger.err('importAdhocExportOptionsPlist failed');
+          //   continue;
+          // }
+
+          // if (await iosJobController.createAdhocCertificates == false) {
+          //   _logger.err('createAdhocCertificates failed');
+          //   continue;
+          // }
+
+          // if (await iosJobController.createAdhocMobileProvisioningProfile ==
+          //     false) {
+          //   _logger.err('createAdhocMobileProvisioningProfile failed');
+          //   continue;
+          // }
+
+          // if (await iosJobController.importCertificates == false) {
+          //   _logger.err('importCertificates failed');
+          //   continue;
+          // }
+          // if (await iosJobController.importP8 == false) {
+          //   _logger.err('importP8 failed');
+          //   continue;
+          // }
+
+          // if (await iosJobController.runCustomScript == false) {
+          //   _logger.err('runCustomScript failed');
+          //   continue;
+          // }
+
+          // if (await iosJobController.buildIpa == false) {
+          //   _logger.err('buildIpa failed');
+          //   continue;
+          // }
+
+          // if (distribution.distribution == 'fad') {
+          //   if (await iosJobController.uploadIpaToFAD == false) {
+          //     _logger.err('uploadIpaToFAD failed');
+          //     continue;
+          //   }
+          // }
+
+          // if (distribution.distribution == 'testFlight') {
+          //   if (await iosJobController.uploadIpaToTestFlight == false) {
+          //     _logger.err('uploadIpaToTestFlight failed');
+          //     continue;
+          //   }
+          // }
+
+          // await firestore
+          //     .collection('users')
+          //     .doc(user.userId)
+          //     .update({'iosBuildNumber': user.iosBuildNumber + 1});
+
+          // await firestore
+          //     .collection(jobsPath)
+          //     .doc(job.documentId)
+          //     .update({'success': true});
+
+          // _logger.success('build success');
+
+          // await vm.stopVM;
+        }
+      } catch (e, s) {
+        _logger
+          ..err('CLI crashed: $e')
+          ..err('StackTrace: $s');
+
+        await Sentry.captureException(
+          e,
+          stackTrace: s,
+        );
 
         await Future<void>.delayed(const Duration(seconds: 2));
 

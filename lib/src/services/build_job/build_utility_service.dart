@@ -1,0 +1,74 @@
+import 'package:dart_firebase_admin/firestore.dart';
+import 'package:dartssh2/dartssh2.dart';
+import 'package:openci_runner/src/features/job/domain/job_data_v2.dart';
+import 'package:openci_runner/src/services/firebase/firestore/firestore_path.dart';
+import 'package:openci_runner/src/services/shell/ssh_shell_service.dart';
+import 'package:openci_runner/src/services/vm_service.dart';
+
+class BuildUtilityService {
+  BuildUtilityService(
+    this._firestore,
+    this._vmService,
+  );
+  final Firestore _firestore;
+  final VMService _vmService;
+
+  Future<void> handleJobFailure(
+    String jobDocumentId,
+    String workingVMName,
+  ) async {
+    await _vmService.stopVM(workingVMName);
+    await _markJobAsFailed(jobDocumentId);
+  }
+
+  Future<void> _markJobAsFailed(String jobDocumentId) async {
+    await _firestore
+        .collection(FirestorePath.jobsDomain)
+        .doc(jobDocumentId)
+        .update({
+      'buildStatus.failure': true,
+    });
+  }
+
+  Future<void> markBuildAsStarted(String jobDocumentId) async {
+    await _firestore
+        .collection(FirestorePath.jobsDomain)
+        .doc(jobDocumentId)
+        .update({
+      'buildStatus.processing': true,
+    });
+  }
+
+  Future<void> importServiceAccountJson(
+    String serviceAccountJsonPath,
+    SSHShellService sshShellService,
+    SSHClient sshClient,
+    String jobId,
+    String workingVMName,
+    String appName,
+    String downloadUrl,
+  ) async {
+    await sshShellService.executeCommand(
+      'cd ~/Downloads/$appName/ && curl -L -o "service_account.json" "$downloadUrl"',
+      sshClient,
+      jobId,
+      workingVMName,
+    );
+  }
+
+  Future<void> cloneRepository(
+    SSHShellService sshShellService,
+    SSHClient sshClient,
+    BuildModel buildModel,
+    String jobId,
+    String workingVMName,
+    String installationToken,
+  ) async {
+    await sshShellService.executeCommand(
+      'cd ~/Downloads && git clone -b ${buildModel.branch.buildBranch} https://x-access-token:$installationToken@github.com/${buildModel.github.owner}/${buildModel.github.repositoryName}.git',
+      sshClient,
+      jobId,
+      workingVMName,
+    );
+  }
+}

@@ -8,7 +8,6 @@ import 'package:openci_runner/src/features/runner/runner_command.dart';
 import 'package:openci_runner/src/features/user/domain/user_data.dart';
 import 'package:openci_runner/src/features/vm/controller/vm_controller.dart';
 import 'package:openci_runner/src/services/ssh/ssh_service.dart';
-import 'package:openci_runner/src/utilities/github/github_service.dart';
 import 'package:uuid/uuid.dart';
 
 class AndroidJobController {
@@ -16,7 +15,6 @@ class AndroidJobController {
     required this.sshService,
     required this.sshClient,
     required this.jobData,
-    required this.gitHubService,
     required this.userData,
     required this.firestore,
     required this.distribution,
@@ -26,7 +24,6 @@ class AndroidJobController {
   final SSHService sshService;
   final SSHClient sshClient;
   final JobData jobData;
-  final GitHubService gitHubService;
   final UserData userData;
   final Firestore firestore;
   final Distribution distribution;
@@ -95,13 +92,13 @@ class AndroidJobController {
     }
   }
 
-  Future<bool> get cloneRepository =>
-      shellV2(gitHubService.clone(job: jobData, url: _githubUrl));
+  // Future<bool> get cloneRepository =>
+  //     shellV2(gitHubService.clone(job: jobData, url: _githubUrl));
 
-  String get _githubUrl => gitHubService.convertUrl(
-        userData.githubRepositoryUrl,
-        jobData.githubPAT,
-      );
+  // String get _githubUrl => gitHubService.convertUrl(
+  //       userData.githubRepositoryUrl,
+  //       jobData.githubPAT,
+  //     );
 
   Future<bool> get importServiceAccountJson async => shellV2(
         'cd ~/Downloads/${userData.appName} && echo "${userData.serviceAccountJson}" | base64 -d > service_account.json;',

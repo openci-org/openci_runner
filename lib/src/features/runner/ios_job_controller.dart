@@ -11,7 +11,6 @@ import 'package:openci_runner/src/features/vm/controller/vm_controller.dart';
 import 'package:openci_runner/src/services/macos/directory_paths.dart';
 import 'package:openci_runner/src/services/ssh/domain/session_result.dart';
 import 'package:openci_runner/src/services/ssh/ssh_service.dart';
-import 'package:openci_runner/src/utilities/github/github_service.dart';
 import 'package:uuid/uuid.dart';
 
 part 'ios_job_controller.freezed.dart';
@@ -28,8 +27,6 @@ class IosJobController {
   IosJobController({
     required this.sshService,
     required this.sshClient,
-    required this.jobData,
-    required this.gitHubService,
     required this.userData,
     required this.firestore,
     required this.distribution,
@@ -38,8 +35,6 @@ class IosJobController {
 
   final SSHService sshService;
   final SSHClient sshClient;
-  final JobData jobData;
-  final GitHubService gitHubService;
   final UserData userData;
   final Firestore firestore;
   final Distribution distribution;
@@ -53,27 +48,27 @@ class IosJobController {
       command,
     );
     // TODO(mafreud): save command, stdout, stderr, exitCode to Firestore
-    final logDocumentId = const Uuid().v4();
-    await firestore
-        .collection(jobsPath)
-        .doc(jobData.documentId)
-        .collection('logs')
-        .doc(logDocumentId)
-        .set({
-      'command': command,
-      'stdout': sessionResult.sessionStdout,
-      'stderr': sessionResult.sessionStderr,
-      'exitCode': sessionResult.sessionExitCode,
-      'createdAt': FieldValue.serverTimestamp,
-    });
+    // final logDocumentId = const Uuid().v4();
+    // await firestore
+    //     .collection(jobsPath)
+    //     .doc(jobData.documentId)
+    //     .collection('logs')
+    //     .doc(logDocumentId)
+    //     .set({
+    //   'command': command,
+    //   'stdout': sessionResult.sessionStdout,
+    //   'stderr': sessionResult.sessionStderr,
+    //   'exitCode': sessionResult.sessionExitCode,
+    //   'createdAt': FieldValue.serverTimestamp,
+    // });
 
     final exitCode = sessionResult.sessionExitCode;
     if (exitCode == 0) {
       return ShellResult(result: true, sessionResult: sessionResult);
     } else {
-      await firestore.collection(jobsPath).doc(jobData.documentId).update({
-        'failure': true,
-      });
+      // await firestore.collection(jobsPath).doc(jobData.documentId).update({
+      //   'failure': true,
+      // });
       await vmController.stopVM;
       return ShellResult(result: false, sessionResult: sessionResult);
     }
@@ -95,18 +90,18 @@ class IosJobController {
     );
     // TODO(mafreud): save command, stdout, stderr, exitCode to Firestore
     final logDocumentId = const Uuid().v4();
-    await firestore
-        .collection(jobsPath)
-        .doc(jobData.documentId)
-        .collection('logs')
-        .doc(logDocumentId)
-        .set({
-      'command': command,
-      'stdout': sessionResult.sessionStdout,
-      'stderr': sessionResult.sessionStderr,
-      'exitCode': sessionResult.sessionExitCode,
-      'createdAt': FieldValue.serverTimestamp,
-    });
+    // await firestore
+    //     .collection(jobsPath)
+    //     .doc(jobData.documentId)
+    //     .collection('logs')
+    //     .doc(logDocumentId)
+    //     .set({
+    //   'command': command,
+    //   'stdout': sessionResult.sessionStdout,
+    //   'stderr': sessionResult.sessionStderr,
+    //   'exitCode': sessionResult.sessionExitCode,
+    //   'createdAt': FieldValue.serverTimestamp,
+    // });
 
     final exitCode = sessionResult.sessionExitCode;
     if (exitCode == 0) {
@@ -165,14 +160,6 @@ echo -n ${userData.buildCertificateBase64} | base64 --decode -o $p12;
   Future<bool> get createAdhocMobileProvisioningProfile => shellV2WithResult('''
 echo -n ${userData.buildProvisioningProfileBase64} | base64 --decode -o $mobileprovisionPath;
 ''');
-
-  Future<bool> get cloneRepository =>
-      shellV2WithResult(gitHubService.clone(job: jobData, url: _githubUrl));
-
-  String get _githubUrl => gitHubService.convertUrl(
-        userData.githubRepositoryUrl,
-        jobData.githubPAT,
-      );
 
   Future<bool> get importServiceAccountJson async => shellV2WithResult(
         'cd ~/Downloads/${userData.appName} && echo "${userData.serviceAccountJson}" | base64 -d > service_account.json;',

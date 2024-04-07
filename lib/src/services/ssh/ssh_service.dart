@@ -4,9 +4,16 @@ import 'dart:typed_data';
 
 import 'package:dartssh2/dartssh2.dart';
 import 'package:mason_logger/mason_logger.dart';
+import 'package:openci_runner/src/services/build_job/build_utility_service.dart';
+import 'package:openci_runner/src/services/log/log_service.dart';
+import 'package:openci_runner/src/services/shell/shell_result.dart';
 import 'package:openci_runner/src/services/ssh/domain/session_result.dart';
 
 class SSHService {
+  SSHService(this.logService, this._buildUtilityService);
+
+  final LogService logService;
+  final BuildUtilityService _buildUtilityService;
   Logger logger = Logger();
   Future<SSHClient?> sshToServer(
     String vmIp, {
@@ -100,5 +107,31 @@ class SSHService {
     );
 
     return utf8.decode(bytes);
+  }
+
+  Future<ShellResult> shellV2(
+    String command,
+    SSHClient sshClient,
+    String jobId,
+    String workingVMName,
+  ) async {
+    final sessionResult = await runV2(
+      sshClient,
+      command,
+    );
+
+    await logService.saveCommandLog(
+      jobDocumentId: jobId,
+      command: command,
+      sessionResult: sessionResult,
+    );
+
+    final exitCode = sessionResult.sessionExitCode;
+    if (exitCode == 0) {
+      return ShellResult(result: true, sessionResult: sessionResult);
+    } else {
+      await _buildUtilityService.handleJobFailure(jobId, workingVMName);
+      return ShellResult(result: false, sessionResult: sessionResult);
+    }
   }
 }
