@@ -12,9 +12,22 @@ class WorkflowModel with _$WorkflowModel {
     required BuildDistributionChannel distribution,
     required String organizationId,
     required WorkflowFlutterConfig flutter,
+    required WorkflowShorebirdConfig shorebird,
+    required String workflowName,
   }) = _WorkflowModel;
   factory WorkflowModel.fromJson(Map<String, Object?> json) =>
       _$WorkflowModelFromJson(json);
+}
+
+@freezed
+class WorkflowShorebirdConfig with _$WorkflowShorebirdConfig {
+  const factory WorkflowShorebirdConfig({
+    @Default(null) String? token,
+    @Default(null) String? yamlDownloadUrl,
+    @Default(null) bool? useShorebird,
+  }) = _WorkflowShorebirdConfig;
+  factory WorkflowShorebirdConfig.fromJson(Map<String, Object?> json) =>
+      _$WorkflowShorebirdConfigFromJson(json);
 }
 
 @freezed

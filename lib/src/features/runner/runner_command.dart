@@ -12,6 +12,7 @@ import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_runner/src/services/build_job/flutter_version_manager.dart';
 import 'package:openci_runner/src/services/build_job/ipa_build_service.dart';
 import 'package:openci_runner/src/services/build_job/organization/organization_model.dart';
+import 'package:openci_runner/src/services/build_job/workflow/workflow_service.dart';
 import 'package:process_run/shell.dart';
 import 'package:sentry/sentry.dart';
 
@@ -20,7 +21,6 @@ import 'package:openci_runner/src/features/job/domain/job_data_v2.dart';
 import 'package:openci_runner/src/features/vm/controller/vm_controller.dart';
 import 'package:openci_runner/src/services/build_job/build_utility_service.dart';
 import 'package:openci_runner/src/services/build_job/workflow/workflow_model.dart';
-import 'package:openci_runner/src/services/firebase/firestore/firestore_path.dart';
 import 'package:openci_runner/src/services/log/log_service.dart';
 import 'package:openci_runner/src/services/shell/local_shell_service.dart';
 import 'package:openci_runner/src/services/shell/ssh_shell_service.dart';
@@ -214,17 +214,22 @@ class RunnerCommand extends Command<int> {
         final jobId = buildJob.documentId;
         final targetPlatform = buildJob.platform;
         _logger.info('targetPlatform: $targetPlatform');
+        final workflowService = WorkflowService();
 
-        final workflowDocs = await firestore
-            .collection(FirestorePath.workflowDomain)
-            .doc(buildJob.workflowId)
-            .get();
+        final workflow = await workflowService.getWorkflowData(
+          firestore,
+          buildJob.workflowId,
+          jobId,
+        );
 
-        final workflowData = workflowDocs.data();
-        if (workflowData == null) {
-          throw Exception('Workflow data is null for job: $jobId');
+        String? customInfoStyle(String? m) {
+          return backgroundDarkGray.wrap(styleBold.wrap(blue.wrap(m)));
         }
-        final workflow = WorkflowModel.fromJson(workflowData);
+
+        _logger.info(
+          'workflow: ${workflow.workflowName}',
+          style: customInfoStyle,
+        );
 
         // prepare service classes
         final localShellService = LocalShellService();
@@ -395,11 +400,27 @@ class RunnerCommand extends Command<int> {
 
           await ipaBuildService.runCustomScripts();
 
-          // build phase
-          await ipaBuildService.buildIpa(
-            organization.buildNumber.ios,
-            workflow.flutter.flavor,
-          );
+          final useShorebird = workflow.shorebird.useShorebird;
+          if (useShorebird != null && useShorebird == true) {
+            // 失敗しても、次のコマンドが実行されてしまうバグ continueを入れないといけない
+            // これは、try-catchで囲むべきかもしれない
+
+            // exitCodeが0の時は、stderrの文字色はsuccessに。
+
+            // exitCodeが0以外の時は、エラーを吐いて、continueする。
+            await ipaBuildService.buildShorebirdIpa(
+              organization.buildNumber.ios,
+              workflow.flutter.flavor,
+              workflow.shorebird.token,
+              workflow.flutter.version,
+            );
+          } else {
+            await ipaBuildService.buildIpa(
+              organization.buildNumber.ios,
+              workflow.flutter.flavor,
+            );
+          }
+
           _logger.success('ipa build success');
 
           // 以下はBuildDistributionServiceにした方がいいかも。

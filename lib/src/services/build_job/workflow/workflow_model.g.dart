@@ -16,6 +16,9 @@ _$WorkflowModelImpl _$$WorkflowModelImplFromJson(Map<String, dynamic> json) =>
       organizationId: json['organizationId'] as String,
       flutter: WorkflowFlutterConfig.fromJson(
           json['flutter'] as Map<String, dynamic>),
+      shorebird: WorkflowShorebirdConfig.fromJson(
+          json['shorebird'] as Map<String, dynamic>),
+      workflowName: json['workflowName'] as String,
     );
 
 Map<String, dynamic> _$$WorkflowModelImplToJson(_$WorkflowModelImpl instance) =>
@@ -25,6 +28,8 @@ Map<String, dynamic> _$$WorkflowModelImplToJson(_$WorkflowModelImpl instance) =>
       'distribution': _$BuildDistributionChannelEnumMap[instance.distribution]!,
       'organizationId': instance.organizationId,
       'flutter': instance.flutter,
+      'shorebird': instance.shorebird,
+      'workflowName': instance.workflowName,
     };
 
 const _$BuildDistributionChannelEnumMap = {
@@ -33,6 +38,22 @@ const _$BuildDistributionChannelEnumMap = {
   BuildDistributionChannel.playStoreInternal: 'playStoreInternal',
   BuildDistributionChannel.playStoreBeta: 'playStoreBeta',
 };
+
+_$WorkflowShorebirdConfigImpl _$$WorkflowShorebirdConfigImplFromJson(
+        Map<String, dynamic> json) =>
+    _$WorkflowShorebirdConfigImpl(
+      token: json['token'] as String? ?? null,
+      yamlDownloadUrl: json['yamlDownloadUrl'] as String? ?? null,
+      useShorebird: json['useShorebird'] as bool? ?? null,
+    );
+
+Map<String, dynamic> _$$WorkflowShorebirdConfigImplToJson(
+        _$WorkflowShorebirdConfigImpl instance) =>
+    <String, dynamic>{
+      'token': instance.token,
+      'yamlDownloadUrl': instance.yamlDownloadUrl,
+      'useShorebird': instance.useShorebird,
+    };
 
 _$WorkflowFirebaseConfigImpl _$$WorkflowFirebaseConfigImplFromJson(
         Map<String, dynamic> json) =>

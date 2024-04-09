@@ -131,6 +131,39 @@ pod install;
     );
   }
 
+  Future<void> buildShorebirdIpa(
+    int iosBuildNumber,
+    Flavor flavor,
+    String? shorebirdToken,
+    String flutterVersion,
+  ) async {
+    if (shorebirdToken == null) {
+      throw Exception('Shorebird token is required');
+    }
+    var flutterVersionArgument = '--flutter-version=$flutterVersion';
+    if (int.parse(flutterVersion.replaceAll('.', '')) < 3195) {
+      flutterVersionArgument = '';
+    }
+    var command = '';
+    switch (flavor) {
+      case Flavor.none:
+        command = '''
+source ~/.zshrc;
+cd ~/Downloads/$_appName;
+export SHOREBIRD_TOKEN=$shorebirdToken;
+shorebird release ios -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist $flutterVersionArgument; 
+''';
+      default:
+        throw Exception('Flavor must be specified');
+    }
+    await _sshShellService.executeCommand(
+      command,
+      _sshClient,
+      _jobId,
+      _workingVMName,
+    );
+  }
+
   Future<String> ipaPath() async {
     final result = await _sshShellService.executeCommand(
       'find "/Users/admin/Downloads/$_appName/build/ios/ipa" -type f -name "*.ipa"',
