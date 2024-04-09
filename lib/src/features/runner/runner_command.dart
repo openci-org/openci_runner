@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/args.dart';
@@ -7,7 +6,6 @@ import 'package:args/command_runner.dart';
 import 'package:dart_firebase_admin/dart_firebase_admin.dart';
 import 'package:dart_firebase_admin/firestore.dart';
 import 'package:get_it/get_it.dart';
-import 'package:http/http.dart' as http;
 import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_runner/src/features/job/domain/job_data.dart';
 import 'package:openci_runner/src/features/job/domain/job_data_v2.dart';
@@ -18,6 +16,8 @@ import 'package:openci_runner/src/services/build_job/ipa_build_service.dart';
 import 'package:openci_runner/src/services/build_job/organization/organization_model.dart';
 import 'package:openci_runner/src/services/build_job/workflow/workflow_model.dart';
 import 'package:openci_runner/src/services/build_job/workflow/workflow_service.dart';
+import 'package:openci_runner/src/services/firebase/firestore/firestore_path.dart';
+import 'package:openci_runner/src/services/github_service.dart';
 import 'package:openci_runner/src/services/log/log_service.dart';
 import 'package:openci_runner/src/services/shell/local_shell_service.dart';
 import 'package:openci_runner/src/services/shell/ssh_shell_service.dart';
@@ -27,33 +27,6 @@ import 'package:openci_runner/src/services/uuid/uuid_service.dart';
 import 'package:openci_runner/src/services/vm_service.dart';
 import 'package:process_run/shell.dart';
 import 'package:sentry/sentry.dart';
-
-Future<String> getInstallationToken(
-  int appId,
-  String privateKey,
-  int installationId,
-) async {
-  const url = 'https://getinstallationtoken-wvluvdjkzq-uc.a.run.app';
-
-  final response = await http.post(
-    Uri.parse(url),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({
-      'appId': appId,
-      'privateKey': privateKey,
-      'installationId': installationId,
-    }),
-  );
-
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body) as Map<String, dynamic>;
-    return data['installationToken'] as String;
-  } else {
-    throw Exception(
-      'Failed to get installation token. Status code: ${response.statusCode}',
-    );
-  }
-}
 
 class AppConfig {
   AppConfig({
@@ -65,8 +38,6 @@ class AppConfig {
   final String firebaseServiceAccountJson;
   final String pem;
 }
-
-const jobsPath = 'jobs_v3';
 
 bool shouldExit = false;
 
@@ -192,7 +163,7 @@ class RunnerCommand extends Command<int> {
         }
 
         final jobsQs = await firestore
-            .collection(jobsPath)
+            .collection(FirestorePath.jobsDomain)
             .where('buildStatus.processing', WhereFilter.equal, false)
             .where('buildStatus.success', WhereFilter.equal, false)
             .where('buildStatus.failure', WhereFilter.equal, false)
@@ -240,8 +211,9 @@ class RunnerCommand extends Command<int> {
 
         final privateKeyFile = File(appConfig.pem);
         final privateKey = await privateKeyFile.readAsString();
+        final githubService = GitHubService();
 
-        final tokenId = await getInstallationToken(
+        final tokenId = await githubService.getInstallationToken(
           buildJob.github.appId,
           privateKey,
           buildJob.github.installationId,
