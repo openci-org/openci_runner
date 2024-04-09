@@ -9,6 +9,9 @@ import 'package:dart_firebase_admin/firestore.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:mason_logger/mason_logger.dart';
+import 'package:openci_runner/src/services/build_job/flutter_version_manager.dart';
+import 'package:openci_runner/src/services/build_job/ipa_build_service.dart';
+import 'package:openci_runner/src/services/build_job/organization/organization_model.dart';
 import 'package:process_run/shell.dart';
 import 'package:sentry/sentry.dart';
 
@@ -269,6 +272,19 @@ class RunnerCommand extends Command<int> {
           throw Exception('ssh client is null');
         }
         final sshShellService = SSHShellService(sshService);
+        final appName = buildJob.github.repositoryName;
+
+        final organizationDocs = await firestore
+            .collection('organizations')
+            .doc(workflow.organizationId)
+            .get();
+        final organizationData = organizationDocs.data();
+        if (organizationData == null) {
+          throw Exception(
+            'organizationData is null: ${workflow.organizationId}',
+          );
+        }
+        final organization = OrganizationModel.fromJson(organizationData);
 
         if (targetPlatform == TargetPlatform.android) {
           // final androidJobController = AndroidJobController(
@@ -338,6 +354,13 @@ class RunnerCommand extends Command<int> {
 
           // await vm.stopVM;
         } else if (targetPlatform == TargetPlatform.ios) {
+          final ipaBuildService = IpaBuildService(
+            sshShellService,
+            sshClient,
+            jobId,
+            vm.workingVMName,
+            appName,
+          );
           await buildUtilityService.cloneRepository(
             sshShellService,
             sshClient,
@@ -346,83 +369,90 @@ class RunnerCommand extends Command<int> {
             vm.workingVMName,
             tokenId,
           );
-          final serviceAccountJsonDownloadUrl =
-              workflow.firebase.serviceAccountJson;
 
-          if (serviceAccountJsonDownloadUrl != null) {
-            await buildUtilityService.importServiceAccountJson(
-              appConfig.firebaseServiceAccountJson,
-              sshShellService,
-              sshClient,
-              jobId,
-              vm.workingVMName,
-              buildJob.github.repositoryName,
-              serviceAccountJsonDownloadUrl,
-            );
+          await ipaBuildService.downloadExportOptionsPlist(
+            workflow.ios.exportOptions,
+          );
+          await ipaBuildService.createCertificateDirectory();
+          await ipaBuildService.downloadP12Certificate(
+            workflow.ios.p12,
+          );
+          await ipaBuildService.downloadMobileProvisioningProfile(
+            workflow.ios.provisioningProfile,
+          );
+          await ipaBuildService.importCertificates();
+
+          final flutterVersionManager = FlutterVersionManager(
+            sshShellService,
+            sshClient,
+            jobId,
+            vm.workingVMName,
+            appName,
+          );
+
+          await flutterVersionManager
+              .changeFlutterVersion(workflow.flutter.version);
+
+          await ipaBuildService.runCustomScripts();
+
+          // build phase
+          await ipaBuildService.buildIpa(
+            organization.buildNumber.ios,
+            workflow.flutter.flavor,
+          );
+          _logger.success('ipa build success');
+
+          // 以下はBuildDistributionServiceにした方がいいかも。
+          // Prepare for distribution
+          final distribution = workflow.distribution;
+
+          switch (distribution) {
+            case BuildDistributionChannel.firebaseAppDistribution:
+              final serviceAccountJsonDownloadUrl =
+                  workflow.firebase.serviceAccountJson;
+              if (serviceAccountJsonDownloadUrl == null) {
+                throw Exception('Service account json download url is null');
+              }
+              await buildUtilityService.importServiceAccountJson(
+                appConfig.firebaseServiceAccountJson,
+                sshShellService,
+                sshClient,
+                jobId,
+                vm.workingVMName,
+                appName,
+                serviceAccountJsonDownloadUrl,
+              );
+              await ipaBuildService.uploadIpaToFirebaseAppDistribution(
+                workflow.firebase.appIdIos,
+                workflow.firebase.appDistribution.testerGroups,
+              );
+              _logger.success('upload build success');
+            case BuildDistributionChannel.testFlight:
+            // if (await iosJobController.importP8 == false) {
+            //   _logger.err('importP8 failed');
+            //   continue;
+            // }
+            // if (distribution.distribution == 'testFlight') {
+            //   if (await iosJobController.uploadIpaToTestFlight == false) {
+            //     _logger.err('uploadIpaToTestFlight failed');
+            //     continue;
+            //   }
+            // }
+            case BuildDistributionChannel.playStoreInternal:
+            case BuildDistributionChannel.playStoreBeta:
           }
 
-          // if (await iosJobController.importAdhocExportOptionsPlist == false) {
-          //   _logger.err('importAdhocExportOptionsPlist failed');
-          //   continue;
-          // }
+          await buildUtilityService.incrementBuildNumber(
+            organization.documentId,
+            organization.buildNumber,
+            TargetPlatform.ios,
+          );
+          _logger.success('ios buildNumber update success');
 
-          // if (await iosJobController.createAdhocCertificates == false) {
-          //   _logger.err('createAdhocCertificates failed');
-          //   continue;
-          // }
+          await buildUtilityService.markJobAsSuccess(jobId);
+          _logger.success('whole build process completed');
 
-          // if (await iosJobController.createAdhocMobileProvisioningProfile ==
-          //     false) {
-          //   _logger.err('createAdhocMobileProvisioningProfile failed');
-          //   continue;
-          // }
-
-          // if (await iosJobController.importCertificates == false) {
-          //   _logger.err('importCertificates failed');
-          //   continue;
-          // }
-          // if (await iosJobController.importP8 == false) {
-          //   _logger.err('importP8 failed');
-          //   continue;
-          // }
-
-          // if (await iosJobController.runCustomScript == false) {
-          //   _logger.err('runCustomScript failed');
-          //   continue;
-          // }
-
-          // if (await iosJobController.buildIpa == false) {
-          //   _logger.err('buildIpa failed');
-          //   continue;
-          // }
-
-          // if (distribution.distribution == 'fad') {
-          //   if (await iosJobController.uploadIpaToFAD == false) {
-          //     _logger.err('uploadIpaToFAD failed');
-          //     continue;
-          //   }
-          // }
-
-          // if (distribution.distribution == 'testFlight') {
-          //   if (await iosJobController.uploadIpaToTestFlight == false) {
-          //     _logger.err('uploadIpaToTestFlight failed');
-          //     continue;
-          //   }
-          // }
-
-          // await firestore
-          //     .collection('users')
-          //     .doc(user.userId)
-          //     .update({'iosBuildNumber': user.iosBuildNumber + 1});
-
-          // await firestore
-          //     .collection(jobsPath)
-          //     .doc(job.documentId)
-          //     .update({'success': true});
-
-          // _logger.success('build success');
-
-          // await vm.stopVM;
+          await vm.stopVM;
         }
       } catch (e, s) {
         _logger

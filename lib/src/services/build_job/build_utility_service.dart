@@ -1,6 +1,8 @@
 import 'package:dart_firebase_admin/firestore.dart';
 import 'package:dartssh2/dartssh2.dart';
+import 'package:openci_runner/src/features/job/domain/job_data.dart';
 import 'package:openci_runner/src/features/job/domain/job_data_v2.dart';
+import 'package:openci_runner/src/services/build_job/organization/organization_model.dart';
 import 'package:openci_runner/src/services/firebase/firestore/firestore_path.dart';
 import 'package:openci_runner/src/services/shell/ssh_shell_service.dart';
 import 'package:openci_runner/src/services/vm_service.dart';
@@ -70,5 +72,36 @@ class BuildUtilityService {
       jobId,
       workingVMName,
     );
+  }
+
+  Future<void> incrementBuildNumber(
+    String organizationId,
+    BuildNumber previousBuildNumber,
+    TargetPlatform platform,
+  ) async {
+    final docRef = _firestore
+        .collection(FirestorePath.organizationDomain)
+        .doc(organizationId);
+    switch (platform) {
+      case TargetPlatform.ios:
+        await docRef.update({
+          'buildNumber.ios': previousBuildNumber.ios + 1,
+        });
+      case TargetPlatform.android:
+        await docRef.update({
+          'buildNumber.android': previousBuildNumber.android + 1,
+        });
+    }
+  }
+
+  Future<void> markJobAsSuccess(
+    String jobDocumentId,
+  ) async {
+    await _firestore
+        .collection(FirestorePath.jobsDomain)
+        .doc(jobDocumentId)
+        .update({
+      'buildStatus.success': true,
+    });
   }
 }

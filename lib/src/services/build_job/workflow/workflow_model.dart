@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:openci_runner/src/features/user/domain/user_data.dart';
 
 part 'workflow_model.freezed.dart';
 part 'workflow_model.g.dart';
@@ -6,18 +7,60 @@ part 'workflow_model.g.dart';
 @freezed
 class WorkflowModel with _$WorkflowModel {
   const factory WorkflowModel({
-    required WorkflowFirebase firebase,
+    required WorkflowFirebaseConfig firebase,
+    required WorkflowIosConfig ios,
+    required BuildDistributionChannel distribution,
+    required String organizationId,
+    required WorkflowFlutterConfig flutter,
   }) = _WorkflowModel;
   factory WorkflowModel.fromJson(Map<String, Object?> json) =>
       _$WorkflowModelFromJson(json);
 }
 
 @freezed
-class WorkflowFirebase with _$WorkflowFirebase {
-  const factory WorkflowFirebase({
+class WorkflowFirebaseConfig with _$WorkflowFirebaseConfig {
+  const factory WorkflowFirebaseConfig({
+    required AppDistributionConfig appDistribution,
     @Default(null) String? appIdIos,
     @Default(null) String? serviceAccountJson,
-  }) = _WorkflowFirebase;
-  factory WorkflowFirebase.fromJson(Map<String, Object?> json) =>
-      _$WorkflowFirebaseFromJson(json);
+  }) = _WorkflowFirebaseConfig;
+  factory WorkflowFirebaseConfig.fromJson(Map<String, Object?> json) =>
+      _$WorkflowFirebaseConfigFromJson(json);
+}
+
+@freezed
+class WorkflowIosConfig with _$WorkflowIosConfig {
+  const factory WorkflowIosConfig({
+    @Default(null) String? exportOptions,
+    @Default(null) String? p12,
+    @Default(null) String? provisioningProfile,
+  }) = _WorkflowIosConfig;
+  factory WorkflowIosConfig.fromJson(Map<String, Object?> json) =>
+      _$WorkflowIosConfigFromJson(json);
+}
+
+@freezed
+class WorkflowFlutterConfig with _$WorkflowFlutterConfig {
+  const factory WorkflowFlutterConfig({
+    required Flavor flavor,
+    required String version,
+  }) = _WorkflowFlutterConfig;
+  factory WorkflowFlutterConfig.fromJson(Map<String, Object?> json) =>
+      _$WorkflowFlutterConfigFromJson(json);
+}
+
+@freezed
+class AppDistributionConfig with _$AppDistributionConfig {
+  const factory AppDistributionConfig({
+    @Default(null) List<String>? testerGroups,
+  }) = _AppDistributionConfig;
+  factory AppDistributionConfig.fromJson(Map<String, Object?> json) =>
+      _$AppDistributionConfigFromJson(json);
+}
+
+enum BuildDistributionChannel {
+  firebaseAppDistribution,
+  testFlight,
+  playStoreInternal,
+  playStoreBeta;
 }
