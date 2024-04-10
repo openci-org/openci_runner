@@ -88,10 +88,17 @@ class SSHService {
     exitCode = session.exitCode;
     sessionStdout = await streamToString(session.stdout);
     sessionStderr = await streamToString(session.stderr);
-    logger
-      ..success('session.stdout: $sessionStdout')
-      ..err('session.stderr: $sessionStderr')
-      ..info(session.exitCode.toString());
+    if (exitCode == 0) {
+      logger
+        ..success('session.stdout: $sessionStdout')
+        ..success('session.stderr: $sessionStderr')
+        ..success('exitCode: ${session.exitCode}');
+    } else {
+      logger
+        ..success('session.stdout: $sessionStdout')
+        ..err('session.stderr: $sessionStderr')
+        ..info(session.exitCode.toString());
+    }
 
     return SessionResult(
       sessionExitCode: exitCode,
