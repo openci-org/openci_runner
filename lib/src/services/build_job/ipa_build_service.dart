@@ -1,6 +1,7 @@
 import 'package:dartssh2/dartssh2.dart';
 import 'package:openci_runner/src/features/user/domain/user_data.dart';
 import 'package:openci_runner/src/services/macos/directory_paths.dart';
+import 'package:openci_runner/src/services/shell/shell_result.dart';
 import 'package:openci_runner/src/services/shell/ssh_shell_service.dart';
 
 class IpaBuildService {
@@ -131,7 +132,7 @@ pod install;
     );
   }
 
-  Future<void> buildShorebirdIpa(
+  Future<ShellResult> buildShorebirdIpa(
     int iosBuildNumber,
     Flavor flavor,
     String? shorebirdToken,
@@ -156,7 +157,7 @@ shorebird release ios -- --build-number=$iosBuildNumber --export-options-plist=i
       default:
         throw Exception('Flavor must be specified');
     }
-    await _sshShellService.executeCommand(
+    return _sshShellService.executeCommand(
       command,
       _sshClient,
       _jobId,

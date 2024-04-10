@@ -377,8 +377,6 @@ class RunnerCommand extends Command<int> {
             // これは、try-catchで囲むべきかもしれない
 
             // exitCodeが0の時は、stderrの文字色はsuccessに。
-
-            // exitCodeが0以外の時は、エラーを吐いて、continueする。
             await ipaBuildService.buildShorebirdIpa(
               organization.buildNumber.ios,
               workflow.flutter.flavor,

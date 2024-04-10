@@ -131,7 +131,7 @@ class SSHService {
       return ShellResult(result: true, sessionResult: sessionResult);
     } else {
       await _buildUtilityService.handleJobFailure(jobId, workingVMName);
-      return ShellResult(result: false, sessionResult: sessionResult);
+      throw Exception('$command failed with exit code $exitCode');
     }
   }
 }
