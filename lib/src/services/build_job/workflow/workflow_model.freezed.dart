@@ -728,7 +728,10 @@ WorkflowIosConfig _$WorkflowIosConfigFromJson(Map<String, dynamic> json) {
 mixin _$WorkflowIosConfig {
   String? get exportOptions => throw _privateConstructorUsedError;
   String? get p12 => throw _privateConstructorUsedError;
-  String? get provisioningProfile => throw _privateConstructorUsedError;
+  WorkflowProvisioningProfileConfig? get provisioningProfile =>
+      throw _privateConstructorUsedError;
+  WorkflowAppStoreConnectAPI? get appStoreConnectAPI =>
+      throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -742,7 +745,14 @@ abstract class $WorkflowIosConfigCopyWith<$Res> {
           WorkflowIosConfig value, $Res Function(WorkflowIosConfig) then) =
       _$WorkflowIosConfigCopyWithImpl<$Res, WorkflowIosConfig>;
   @useResult
-  $Res call({String? exportOptions, String? p12, String? provisioningProfile});
+  $Res call(
+      {String? exportOptions,
+      String? p12,
+      WorkflowProvisioningProfileConfig? provisioningProfile,
+      WorkflowAppStoreConnectAPI? appStoreConnectAPI});
+
+  $WorkflowProvisioningProfileConfigCopyWith<$Res>? get provisioningProfile;
+  $WorkflowAppStoreConnectAPICopyWith<$Res>? get appStoreConnectAPI;
 }
 
 /// @nodoc
@@ -761,6 +771,7 @@ class _$WorkflowIosConfigCopyWithImpl<$Res, $Val extends WorkflowIosConfig>
     Object? exportOptions = freezed,
     Object? p12 = freezed,
     Object? provisioningProfile = freezed,
+    Object? appStoreConnectAPI = freezed,
   }) {
     return _then(_value.copyWith(
       exportOptions: freezed == exportOptions
@@ -774,8 +785,38 @@ class _$WorkflowIosConfigCopyWithImpl<$Res, $Val extends WorkflowIosConfig>
       provisioningProfile: freezed == provisioningProfile
           ? _value.provisioningProfile
           : provisioningProfile // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as WorkflowProvisioningProfileConfig?,
+      appStoreConnectAPI: freezed == appStoreConnectAPI
+          ? _value.appStoreConnectAPI
+          : appStoreConnectAPI // ignore: cast_nullable_to_non_nullable
+              as WorkflowAppStoreConnectAPI?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $WorkflowProvisioningProfileConfigCopyWith<$Res>? get provisioningProfile {
+    if (_value.provisioningProfile == null) {
+      return null;
+    }
+
+    return $WorkflowProvisioningProfileConfigCopyWith<$Res>(
+        _value.provisioningProfile!, (value) {
+      return _then(_value.copyWith(provisioningProfile: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $WorkflowAppStoreConnectAPICopyWith<$Res>? get appStoreConnectAPI {
+    if (_value.appStoreConnectAPI == null) {
+      return null;
+    }
+
+    return $WorkflowAppStoreConnectAPICopyWith<$Res>(_value.appStoreConnectAPI!,
+        (value) {
+      return _then(_value.copyWith(appStoreConnectAPI: value) as $Val);
+    });
   }
 }
 
@@ -787,7 +828,16 @@ abstract class _$$WorkflowIosConfigImplCopyWith<$Res>
       __$$WorkflowIosConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? exportOptions, String? p12, String? provisioningProfile});
+  $Res call(
+      {String? exportOptions,
+      String? p12,
+      WorkflowProvisioningProfileConfig? provisioningProfile,
+      WorkflowAppStoreConnectAPI? appStoreConnectAPI});
+
+  @override
+  $WorkflowProvisioningProfileConfigCopyWith<$Res>? get provisioningProfile;
+  @override
+  $WorkflowAppStoreConnectAPICopyWith<$Res>? get appStoreConnectAPI;
 }
 
 /// @nodoc
@@ -804,6 +854,7 @@ class __$$WorkflowIosConfigImplCopyWithImpl<$Res>
     Object? exportOptions = freezed,
     Object? p12 = freezed,
     Object? provisioningProfile = freezed,
+    Object? appStoreConnectAPI = freezed,
   }) {
     return _then(_$WorkflowIosConfigImpl(
       exportOptions: freezed == exportOptions
@@ -817,7 +868,11 @@ class __$$WorkflowIosConfigImplCopyWithImpl<$Res>
       provisioningProfile: freezed == provisioningProfile
           ? _value.provisioningProfile
           : provisioningProfile // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as WorkflowProvisioningProfileConfig?,
+      appStoreConnectAPI: freezed == appStoreConnectAPI
+          ? _value.appStoreConnectAPI
+          : appStoreConnectAPI // ignore: cast_nullable_to_non_nullable
+              as WorkflowAppStoreConnectAPI?,
     ));
   }
 }
@@ -828,7 +883,8 @@ class _$WorkflowIosConfigImpl implements _WorkflowIosConfig {
   const _$WorkflowIosConfigImpl(
       {this.exportOptions = null,
       this.p12 = null,
-      this.provisioningProfile = null});
+      this.provisioningProfile = null,
+      this.appStoreConnectAPI = null});
 
   factory _$WorkflowIosConfigImpl.fromJson(Map<String, dynamic> json) =>
       _$$WorkflowIosConfigImplFromJson(json);
@@ -841,11 +897,14 @@ class _$WorkflowIosConfigImpl implements _WorkflowIosConfig {
   final String? p12;
   @override
   @JsonKey()
-  final String? provisioningProfile;
+  final WorkflowProvisioningProfileConfig? provisioningProfile;
+  @override
+  @JsonKey()
+  final WorkflowAppStoreConnectAPI? appStoreConnectAPI;
 
   @override
   String toString() {
-    return 'WorkflowIosConfig(exportOptions: $exportOptions, p12: $p12, provisioningProfile: $provisioningProfile)';
+    return 'WorkflowIosConfig(exportOptions: $exportOptions, p12: $p12, provisioningProfile: $provisioningProfile, appStoreConnectAPI: $appStoreConnectAPI)';
   }
 
   @override
@@ -857,13 +916,15 @@ class _$WorkflowIosConfigImpl implements _WorkflowIosConfig {
                 other.exportOptions == exportOptions) &&
             (identical(other.p12, p12) || other.p12 == p12) &&
             (identical(other.provisioningProfile, provisioningProfile) ||
-                other.provisioningProfile == provisioningProfile));
+                other.provisioningProfile == provisioningProfile) &&
+            (identical(other.appStoreConnectAPI, appStoreConnectAPI) ||
+                other.appStoreConnectAPI == appStoreConnectAPI));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, exportOptions, p12, provisioningProfile);
+  int get hashCode => Object.hash(
+      runtimeType, exportOptions, p12, provisioningProfile, appStoreConnectAPI);
 
   @JsonKey(ignore: true)
   @override
@@ -882,9 +943,11 @@ class _$WorkflowIosConfigImpl implements _WorkflowIosConfig {
 
 abstract class _WorkflowIosConfig implements WorkflowIosConfig {
   const factory _WorkflowIosConfig(
-      {final String? exportOptions,
-      final String? p12,
-      final String? provisioningProfile}) = _$WorkflowIosConfigImpl;
+          {final String? exportOptions,
+          final String? p12,
+          final WorkflowProvisioningProfileConfig? provisioningProfile,
+          final WorkflowAppStoreConnectAPI? appStoreConnectAPI}) =
+      _$WorkflowIosConfigImpl;
 
   factory _WorkflowIosConfig.fromJson(Map<String, dynamic> json) =
       _$WorkflowIosConfigImpl.fromJson;
@@ -894,11 +957,369 @@ abstract class _WorkflowIosConfig implements WorkflowIosConfig {
   @override
   String? get p12;
   @override
-  String? get provisioningProfile;
+  WorkflowProvisioningProfileConfig? get provisioningProfile;
+  @override
+  WorkflowAppStoreConnectAPI? get appStoreConnectAPI;
   @override
   @JsonKey(ignore: true)
   _$$WorkflowIosConfigImplCopyWith<_$WorkflowIosConfigImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+WorkflowAppStoreConnectAPI _$WorkflowAppStoreConnectAPIFromJson(
+    Map<String, dynamic> json) {
+  return _WorkflowAppStoreConnectAPI.fromJson(json);
+}
+
+/// @nodoc
+mixin _$WorkflowAppStoreConnectAPI {
+  String? get p8 => throw _privateConstructorUsedError;
+  String? get keyId => throw _privateConstructorUsedError;
+  String? get issuerId => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $WorkflowAppStoreConnectAPICopyWith<WorkflowAppStoreConnectAPI>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $WorkflowAppStoreConnectAPICopyWith<$Res> {
+  factory $WorkflowAppStoreConnectAPICopyWith(WorkflowAppStoreConnectAPI value,
+          $Res Function(WorkflowAppStoreConnectAPI) then) =
+      _$WorkflowAppStoreConnectAPICopyWithImpl<$Res,
+          WorkflowAppStoreConnectAPI>;
+  @useResult
+  $Res call({String? p8, String? keyId, String? issuerId});
+}
+
+/// @nodoc
+class _$WorkflowAppStoreConnectAPICopyWithImpl<$Res,
+        $Val extends WorkflowAppStoreConnectAPI>
+    implements $WorkflowAppStoreConnectAPICopyWith<$Res> {
+  _$WorkflowAppStoreConnectAPICopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? p8 = freezed,
+    Object? keyId = freezed,
+    Object? issuerId = freezed,
+  }) {
+    return _then(_value.copyWith(
+      p8: freezed == p8
+          ? _value.p8
+          : p8 // ignore: cast_nullable_to_non_nullable
+              as String?,
+      keyId: freezed == keyId
+          ? _value.keyId
+          : keyId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      issuerId: freezed == issuerId
+          ? _value.issuerId
+          : issuerId // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$WorkflowAppStoreConnectAPIImplCopyWith<$Res>
+    implements $WorkflowAppStoreConnectAPICopyWith<$Res> {
+  factory _$$WorkflowAppStoreConnectAPIImplCopyWith(
+          _$WorkflowAppStoreConnectAPIImpl value,
+          $Res Function(_$WorkflowAppStoreConnectAPIImpl) then) =
+      __$$WorkflowAppStoreConnectAPIImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String? p8, String? keyId, String? issuerId});
+}
+
+/// @nodoc
+class __$$WorkflowAppStoreConnectAPIImplCopyWithImpl<$Res>
+    extends _$WorkflowAppStoreConnectAPICopyWithImpl<$Res,
+        _$WorkflowAppStoreConnectAPIImpl>
+    implements _$$WorkflowAppStoreConnectAPIImplCopyWith<$Res> {
+  __$$WorkflowAppStoreConnectAPIImplCopyWithImpl(
+      _$WorkflowAppStoreConnectAPIImpl _value,
+      $Res Function(_$WorkflowAppStoreConnectAPIImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? p8 = freezed,
+    Object? keyId = freezed,
+    Object? issuerId = freezed,
+  }) {
+    return _then(_$WorkflowAppStoreConnectAPIImpl(
+      p8: freezed == p8
+          ? _value.p8
+          : p8 // ignore: cast_nullable_to_non_nullable
+              as String?,
+      keyId: freezed == keyId
+          ? _value.keyId
+          : keyId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      issuerId: freezed == issuerId
+          ? _value.issuerId
+          : issuerId // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$WorkflowAppStoreConnectAPIImpl implements _WorkflowAppStoreConnectAPI {
+  const _$WorkflowAppStoreConnectAPIImpl(
+      {this.p8 = null, this.keyId = null, this.issuerId = null});
+
+  factory _$WorkflowAppStoreConnectAPIImpl.fromJson(
+          Map<String, dynamic> json) =>
+      _$$WorkflowAppStoreConnectAPIImplFromJson(json);
+
+  @override
+  @JsonKey()
+  final String? p8;
+  @override
+  @JsonKey()
+  final String? keyId;
+  @override
+  @JsonKey()
+  final String? issuerId;
+
+  @override
+  String toString() {
+    return 'WorkflowAppStoreConnectAPI(p8: $p8, keyId: $keyId, issuerId: $issuerId)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$WorkflowAppStoreConnectAPIImpl &&
+            (identical(other.p8, p8) || other.p8 == p8) &&
+            (identical(other.keyId, keyId) || other.keyId == keyId) &&
+            (identical(other.issuerId, issuerId) ||
+                other.issuerId == issuerId));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, p8, keyId, issuerId);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$WorkflowAppStoreConnectAPIImplCopyWith<_$WorkflowAppStoreConnectAPIImpl>
+      get copyWith => __$$WorkflowAppStoreConnectAPIImplCopyWithImpl<
+          _$WorkflowAppStoreConnectAPIImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$WorkflowAppStoreConnectAPIImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _WorkflowAppStoreConnectAPI
+    implements WorkflowAppStoreConnectAPI {
+  const factory _WorkflowAppStoreConnectAPI(
+      {final String? p8,
+      final String? keyId,
+      final String? issuerId}) = _$WorkflowAppStoreConnectAPIImpl;
+
+  factory _WorkflowAppStoreConnectAPI.fromJson(Map<String, dynamic> json) =
+      _$WorkflowAppStoreConnectAPIImpl.fromJson;
+
+  @override
+  String? get p8;
+  @override
+  String? get keyId;
+  @override
+  String? get issuerId;
+  @override
+  @JsonKey(ignore: true)
+  _$$WorkflowAppStoreConnectAPIImplCopyWith<_$WorkflowAppStoreConnectAPIImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+WorkflowProvisioningProfileConfig _$WorkflowProvisioningProfileConfigFromJson(
+    Map<String, dynamic> json) {
+  return _WorkflowProvisioningProfileConfig.fromJson(json);
+}
+
+/// @nodoc
+mixin _$WorkflowProvisioningProfileConfig {
+  String? get url => throw _privateConstructorUsedError;
+  String? get name => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $WorkflowProvisioningProfileConfigCopyWith<WorkflowProvisioningProfileConfig>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $WorkflowProvisioningProfileConfigCopyWith<$Res> {
+  factory $WorkflowProvisioningProfileConfigCopyWith(
+          WorkflowProvisioningProfileConfig value,
+          $Res Function(WorkflowProvisioningProfileConfig) then) =
+      _$WorkflowProvisioningProfileConfigCopyWithImpl<$Res,
+          WorkflowProvisioningProfileConfig>;
+  @useResult
+  $Res call({String? url, String? name});
+}
+
+/// @nodoc
+class _$WorkflowProvisioningProfileConfigCopyWithImpl<$Res,
+        $Val extends WorkflowProvisioningProfileConfig>
+    implements $WorkflowProvisioningProfileConfigCopyWith<$Res> {
+  _$WorkflowProvisioningProfileConfigCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? url = freezed,
+    Object? name = freezed,
+  }) {
+    return _then(_value.copyWith(
+      url: freezed == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as String?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$WorkflowProvisioningProfileConfigImplCopyWith<$Res>
+    implements $WorkflowProvisioningProfileConfigCopyWith<$Res> {
+  factory _$$WorkflowProvisioningProfileConfigImplCopyWith(
+          _$WorkflowProvisioningProfileConfigImpl value,
+          $Res Function(_$WorkflowProvisioningProfileConfigImpl) then) =
+      __$$WorkflowProvisioningProfileConfigImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String? url, String? name});
+}
+
+/// @nodoc
+class __$$WorkflowProvisioningProfileConfigImplCopyWithImpl<$Res>
+    extends _$WorkflowProvisioningProfileConfigCopyWithImpl<$Res,
+        _$WorkflowProvisioningProfileConfigImpl>
+    implements _$$WorkflowProvisioningProfileConfigImplCopyWith<$Res> {
+  __$$WorkflowProvisioningProfileConfigImplCopyWithImpl(
+      _$WorkflowProvisioningProfileConfigImpl _value,
+      $Res Function(_$WorkflowProvisioningProfileConfigImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? url = freezed,
+    Object? name = freezed,
+  }) {
+    return _then(_$WorkflowProvisioningProfileConfigImpl(
+      url: freezed == url
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as String?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$WorkflowProvisioningProfileConfigImpl
+    implements _WorkflowProvisioningProfileConfig {
+  const _$WorkflowProvisioningProfileConfigImpl(
+      {this.url = null, this.name = null});
+
+  factory _$WorkflowProvisioningProfileConfigImpl.fromJson(
+          Map<String, dynamic> json) =>
+      _$$WorkflowProvisioningProfileConfigImplFromJson(json);
+
+  @override
+  @JsonKey()
+  final String? url;
+  @override
+  @JsonKey()
+  final String? name;
+
+  @override
+  String toString() {
+    return 'WorkflowProvisioningProfileConfig(url: $url, name: $name)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$WorkflowProvisioningProfileConfigImpl &&
+            (identical(other.url, url) || other.url == url) &&
+            (identical(other.name, name) || other.name == name));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, url, name);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$WorkflowProvisioningProfileConfigImplCopyWith<
+          _$WorkflowProvisioningProfileConfigImpl>
+      get copyWith => __$$WorkflowProvisioningProfileConfigImplCopyWithImpl<
+          _$WorkflowProvisioningProfileConfigImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$WorkflowProvisioningProfileConfigImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _WorkflowProvisioningProfileConfig
+    implements WorkflowProvisioningProfileConfig {
+  const factory _WorkflowProvisioningProfileConfig(
+      {final String? url,
+      final String? name}) = _$WorkflowProvisioningProfileConfigImpl;
+
+  factory _WorkflowProvisioningProfileConfig.fromJson(
+          Map<String, dynamic> json) =
+      _$WorkflowProvisioningProfileConfigImpl.fromJson;
+
+  @override
+  String? get url;
+  @override
+  String? get name;
+  @override
+  @JsonKey(ignore: true)
+  _$$WorkflowProvisioningProfileConfigImplCopyWith<
+          _$WorkflowProvisioningProfileConfigImpl>
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 WorkflowFlutterConfig _$WorkflowFlutterConfigFromJson(

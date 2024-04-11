@@ -346,6 +346,15 @@ class RunnerCommand extends Command<int> {
             tokenId,
           );
 
+          await buildUtilityService.changeProvisioningProfile(
+            sshShellService,
+            appName,
+            sshClient,
+            jobId,
+            vm.workingVMName,
+            workflow.ios.provisioningProfile?.name,
+          );
+
           await ipaBuildService.downloadExportOptionsPlist(
             workflow.ios.exportOptions,
           );
@@ -354,7 +363,7 @@ class RunnerCommand extends Command<int> {
             workflow.ios.p12,
           );
           await ipaBuildService.downloadMobileProvisioningProfile(
-            workflow.ios.provisioningProfile,
+            workflow.ios.provisioningProfile?.url,
           );
           await ipaBuildService.importCertificates();
 
@@ -418,16 +427,14 @@ class RunnerCommand extends Command<int> {
               );
               _logger.success('upload build success');
             case BuildDistributionChannel.testFlight:
-            // if (await iosJobController.importP8 == false) {
-            //   _logger.err('importP8 failed');
-            //   continue;
-            // }
-            // if (distribution.distribution == 'testFlight') {
-            //   if (await iosJobController.uploadIpaToTestFlight == false) {
-            //     _logger.err('uploadIpaToTestFlight failed');
-            //     continue;
-            //   }
-            // }
+              await ipaBuildService.downloadP8(
+                workflow.ios.appStoreConnectAPI?.p8,
+                workflow.ios.appStoreConnectAPI?.keyId,
+              );
+              await ipaBuildService.uploadIpaToTestFlight(
+                workflow.ios.appStoreConnectAPI?.keyId,
+                workflow.ios.appStoreConnectAPI?.issuerId,
+              );
             case BuildDistributionChannel.playStoreInternal:
             case BuildDistributionChannel.playStoreBeta:
           }

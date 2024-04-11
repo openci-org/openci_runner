@@ -200,18 +200,48 @@ firebase appdistribution:distribute "$path" --app "$firebaseAppIdIos" --groups "
     );
   }
 
-  // if (await iosJobController.createAdhocMobileProvisioningProfile ==
-  //     false) {
-  //   _logger.err('createAdhocMobileProvisioningProfile failed');
-  //   continue;
-  // }
+  Future<void> downloadP8(
+    String? downloadUrl,
+    String? keyId,
+  ) async {
+    if (downloadUrl == null) {
+      throw Exception('Download URL is required');
+    }
+    if (keyId == null) {
+      throw Exception('Key ID is required');
+    }
+    const privateKeysDir = '~/private_keys';
+    final fileName = 'AuthKey_$keyId.p8';
+    await _sshShellService.executeCommand(
+      '''
+mkdir $privateKeysDir;
+cd $privateKeysDir;
+curl -L -o $fileName "$downloadUrl";
+''',
+      _sshClient,
+      _jobId,
+      _workingVMName,
+    );
+  }
 
-  // if (await iosJobController.importCertificates == false) {
-  //   _logger.err('importCertificates failed');
-  //   continue;
-  // }
-  // if (await iosJobController.importP8 == false) {
-  //   _logger.err('importP8 failed');
-  //   continue;
-  // }
+  Future<void> uploadIpaToTestFlight(
+    String? appStoreConnectKeyId,
+    String? appStoreConnectIssuerId,
+  ) async {
+    if (appStoreConnectKeyId == null) {
+      throw Exception('Download URL is required');
+    }
+    if (appStoreConnectIssuerId == null) {
+      throw Exception('Key ID is required');
+    }
+    final path = await ipaPath();
+    await _sshShellService.executeCommand(
+      '''
+xcrun altool --upload-app -f $path --type ios --apiKey $appStoreConnectKeyId --apiIssuer $appStoreConnectIssuerId
+''',
+      _sshClient,
+      _jobId,
+      _workingVMName,
+    );
+  }
 }

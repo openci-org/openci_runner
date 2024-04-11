@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_string_escapes
+
 import 'package:dart_firebase_admin/firestore.dart';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:openci_runner/src/features/job/domain/job_data.dart';
@@ -103,5 +105,27 @@ class BuildUtilityService {
         .update({
       'buildStatus.success': true,
     });
+  }
+
+  Future<void> changeProvisioningProfile(
+    SSHShellService sshShellService,
+    String appName,
+    SSHClient sshClient,
+    String jobId,
+    String workingVMName,
+    String? provisioningProfileName,
+  ) async {
+    if (provisioningProfileName == null) {
+      throw Exception('Provisioning Profile Name is required');
+    }
+    await sshShellService.executeCommand(
+      '''
+cd ~/Downloads/$appName/ios/Runner.xcodeproj/;
+sed -i '' 's/"PROVISIONING_PROFILE_SPECIFIER\\[sdk=iphoneos\\*\\]" = .*;/"PROVISIONING_PROFILE_SPECIFIER\\[sdk=iphoneos\\*\\]" = "$provisioningProfileName";/g' project.pbxproj
+''',
+      sshClient,
+      jobId,
+      workingVMName,
+    );
   }
 }

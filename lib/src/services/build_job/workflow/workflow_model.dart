@@ -46,10 +46,35 @@ class WorkflowIosConfig with _$WorkflowIosConfig {
   const factory WorkflowIosConfig({
     @Default(null) String? exportOptions,
     @Default(null) String? p12,
-    @Default(null) String? provisioningProfile,
+    @Default(null) WorkflowProvisioningProfileConfig? provisioningProfile,
+    @Default(null) WorkflowAppStoreConnectAPI? appStoreConnectAPI,
   }) = _WorkflowIosConfig;
   factory WorkflowIosConfig.fromJson(Map<String, Object?> json) =>
       _$WorkflowIosConfigFromJson(json);
+}
+
+@freezed
+class WorkflowAppStoreConnectAPI with _$WorkflowAppStoreConnectAPI {
+  const factory WorkflowAppStoreConnectAPI({
+    @Default(null) String? p8,
+    @Default(null) String? keyId,
+    @Default(null) String? issuerId,
+  }) = _WorkflowAppStoreConnectAPI;
+  factory WorkflowAppStoreConnectAPI.fromJson(Map<String, Object?> json) =>
+      _$WorkflowAppStoreConnectAPIFromJson(json);
+}
+
+@freezed
+class WorkflowProvisioningProfileConfig
+    with _$WorkflowProvisioningProfileConfig {
+  const factory WorkflowProvisioningProfileConfig({
+    @Default(null) String? url,
+    @Default(null) String? name,
+  }) = _WorkflowProvisioningProfileConfig;
+  factory WorkflowProvisioningProfileConfig.fromJson(
+    Map<String, Object?> json,
+  ) =>
+      _$WorkflowProvisioningProfileConfigFromJson(json);
 }
 
 @freezed

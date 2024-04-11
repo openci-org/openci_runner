@@ -77,7 +77,14 @@ _$WorkflowIosConfigImpl _$$WorkflowIosConfigImplFromJson(
     _$WorkflowIosConfigImpl(
       exportOptions: json['exportOptions'] as String? ?? null,
       p12: json['p12'] as String? ?? null,
-      provisioningProfile: json['provisioningProfile'] as String? ?? null,
+      provisioningProfile: json['provisioningProfile'] == null
+          ? null
+          : WorkflowProvisioningProfileConfig.fromJson(
+              json['provisioningProfile'] as Map<String, dynamic>),
+      appStoreConnectAPI: json['appStoreConnectAPI'] == null
+          ? null
+          : WorkflowAppStoreConnectAPI.fromJson(
+              json['appStoreConnectAPI'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$WorkflowIosConfigImplToJson(
@@ -86,6 +93,38 @@ Map<String, dynamic> _$$WorkflowIosConfigImplToJson(
       'exportOptions': instance.exportOptions,
       'p12': instance.p12,
       'provisioningProfile': instance.provisioningProfile,
+      'appStoreConnectAPI': instance.appStoreConnectAPI,
+    };
+
+_$WorkflowAppStoreConnectAPIImpl _$$WorkflowAppStoreConnectAPIImplFromJson(
+        Map<String, dynamic> json) =>
+    _$WorkflowAppStoreConnectAPIImpl(
+      p8: json['p8'] as String? ?? null,
+      keyId: json['keyId'] as String? ?? null,
+      issuerId: json['issuerId'] as String? ?? null,
+    );
+
+Map<String, dynamic> _$$WorkflowAppStoreConnectAPIImplToJson(
+        _$WorkflowAppStoreConnectAPIImpl instance) =>
+    <String, dynamic>{
+      'p8': instance.p8,
+      'keyId': instance.keyId,
+      'issuerId': instance.issuerId,
+    };
+
+_$WorkflowProvisioningProfileConfigImpl
+    _$$WorkflowProvisioningProfileConfigImplFromJson(
+            Map<String, dynamic> json) =>
+        _$WorkflowProvisioningProfileConfigImpl(
+          url: json['url'] as String? ?? null,
+          name: json['name'] as String? ?? null,
+        );
+
+Map<String, dynamic> _$$WorkflowProvisioningProfileConfigImplToJson(
+        _$WorkflowProvisioningProfileConfigImpl instance) =>
+    <String, dynamic>{
+      'url': instance.url,
+      'name': instance.name,
     };
 
 _$WorkflowFlutterConfigImpl _$$WorkflowFlutterConfigImplFromJson(
