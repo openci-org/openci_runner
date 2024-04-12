@@ -134,6 +134,10 @@ _$WorkflowFlutterConfigImpl _$$WorkflowFlutterConfigImplFromJson(
     _$WorkflowFlutterConfigImpl(
       flavor: $enumDecode(_$FlavorEnumMap, json['flavor']),
       version: json['version'] as String,
+      dartDefine: (json['dartDefine'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          null,
     );
 
 Map<String, dynamic> _$$WorkflowFlutterConfigImplToJson(
@@ -141,6 +145,7 @@ Map<String, dynamic> _$$WorkflowFlutterConfigImplToJson(
     <String, dynamic>{
       'flavor': _$FlavorEnumMap[instance.flavor]!,
       'version': instance.version,
+      'dartDefine': instance.dartDefine,
     };
 
 const _$FlavorEnumMap = {

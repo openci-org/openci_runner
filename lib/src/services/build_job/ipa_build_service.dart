@@ -112,15 +112,23 @@ pod install;
     );
   }
 
+  String _generateDartDefines(List<String>? dartDefines) {
+    if (dartDefines == null) {
+      return '';
+    }
+    return dartDefines.map((e) => '--dart-define=$e').join(' ');
+  }
+
   Future<void> buildIpa(
     int iosBuildNumber,
     Flavor flavor,
+    List<String>? dartDefines,
   ) async {
     var command = '';
     switch (flavor) {
       case Flavor.none:
         command =
-            'source ~/.zshrc && cd ~/Downloads/$_appName && flutter build ipa --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist;';
+            'source ~/.zshrc && cd ~/Downloads/$_appName && flutter build ipa ${_generateDartDefines(dartDefines)} --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist;';
       default:
         throw Exception('Flavor must be specified');
     }
@@ -137,6 +145,7 @@ pod install;
     Flavor flavor,
     String? shorebirdToken,
     String flutterVersion,
+    List<String>? dartDefines,
   ) async {
     if (shorebirdToken == null) {
       throw Exception('Shorebird token is required');
@@ -152,7 +161,7 @@ pod install;
 source ~/.zshrc;
 cd ~/Downloads/$_appName;
 export SHOREBIRD_TOKEN=$shorebirdToken;
-shorebird release ios $flutterVersionArgument -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist; 
+shorebird release ios $flutterVersionArgument -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist ${_generateDartDefines(dartDefines)}; 
 ''';
       default:
         throw Exception('Flavor must be specified');

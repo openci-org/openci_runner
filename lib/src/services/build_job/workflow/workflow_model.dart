@@ -83,6 +83,7 @@ class WorkflowFlutterConfig with _$WorkflowFlutterConfig {
   const factory WorkflowFlutterConfig({
     required Flavor flavor,
     required String version,
+    @Default(null) List<String>? dartDefine,
   }) = _WorkflowFlutterConfig;
   factory WorkflowFlutterConfig.fromJson(Map<String, Object?> json) =>
       _$WorkflowFlutterConfigFromJson(json);

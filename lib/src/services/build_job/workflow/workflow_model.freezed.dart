@@ -1351,6 +1351,7 @@ WorkflowFlutterConfig _$WorkflowFlutterConfigFromJson(
 mixin _$WorkflowFlutterConfig {
   Flavor get flavor => throw _privateConstructorUsedError;
   String get version => throw _privateConstructorUsedError;
+  List<String>? get dartDefine => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1364,7 +1365,7 @@ abstract class $WorkflowFlutterConfigCopyWith<$Res> {
           $Res Function(WorkflowFlutterConfig) then) =
       _$WorkflowFlutterConfigCopyWithImpl<$Res, WorkflowFlutterConfig>;
   @useResult
-  $Res call({Flavor flavor, String version});
+  $Res call({Flavor flavor, String version, List<String>? dartDefine});
 }
 
 /// @nodoc
@@ -1383,6 +1384,7 @@ class _$WorkflowFlutterConfigCopyWithImpl<$Res,
   $Res call({
     Object? flavor = null,
     Object? version = null,
+    Object? dartDefine = freezed,
   }) {
     return _then(_value.copyWith(
       flavor: null == flavor
@@ -1393,6 +1395,10 @@ class _$WorkflowFlutterConfigCopyWithImpl<$Res,
           ? _value.version
           : version // ignore: cast_nullable_to_non_nullable
               as String,
+      dartDefine: freezed == dartDefine
+          ? _value.dartDefine
+          : dartDefine // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
     ) as $Val);
   }
 }
@@ -1406,7 +1412,7 @@ abstract class _$$WorkflowFlutterConfigImplCopyWith<$Res>
       __$$WorkflowFlutterConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({Flavor flavor, String version});
+  $Res call({Flavor flavor, String version, List<String>? dartDefine});
 }
 
 /// @nodoc
@@ -1423,6 +1429,7 @@ class __$$WorkflowFlutterConfigImplCopyWithImpl<$Res>
   $Res call({
     Object? flavor = null,
     Object? version = null,
+    Object? dartDefine = freezed,
   }) {
     return _then(_$WorkflowFlutterConfigImpl(
       flavor: null == flavor
@@ -1433,6 +1440,10 @@ class __$$WorkflowFlutterConfigImplCopyWithImpl<$Res>
           ? _value.version
           : version // ignore: cast_nullable_to_non_nullable
               as String,
+      dartDefine: freezed == dartDefine
+          ? _value._dartDefine
+          : dartDefine // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
     ));
   }
 }
@@ -1441,7 +1452,10 @@ class __$$WorkflowFlutterConfigImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$WorkflowFlutterConfigImpl implements _WorkflowFlutterConfig {
   const _$WorkflowFlutterConfigImpl(
-      {required this.flavor, required this.version});
+      {required this.flavor,
+      required this.version,
+      final List<String>? dartDefine = null})
+      : _dartDefine = dartDefine;
 
   factory _$WorkflowFlutterConfigImpl.fromJson(Map<String, dynamic> json) =>
       _$$WorkflowFlutterConfigImplFromJson(json);
@@ -1450,10 +1464,20 @@ class _$WorkflowFlutterConfigImpl implements _WorkflowFlutterConfig {
   final Flavor flavor;
   @override
   final String version;
+  final List<String>? _dartDefine;
+  @override
+  @JsonKey()
+  List<String>? get dartDefine {
+    final value = _dartDefine;
+    if (value == null) return null;
+    if (_dartDefine is EqualUnmodifiableListView) return _dartDefine;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString() {
-    return 'WorkflowFlutterConfig(flavor: $flavor, version: $version)';
+    return 'WorkflowFlutterConfig(flavor: $flavor, version: $version, dartDefine: $dartDefine)';
   }
 
   @override
@@ -1462,12 +1486,15 @@ class _$WorkflowFlutterConfigImpl implements _WorkflowFlutterConfig {
         (other.runtimeType == runtimeType &&
             other is _$WorkflowFlutterConfigImpl &&
             (identical(other.flavor, flavor) || other.flavor == flavor) &&
-            (identical(other.version, version) || other.version == version));
+            (identical(other.version, version) || other.version == version) &&
+            const DeepCollectionEquality()
+                .equals(other._dartDefine, _dartDefine));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, flavor, version);
+  int get hashCode => Object.hash(runtimeType, flavor, version,
+      const DeepCollectionEquality().hash(_dartDefine));
 
   @JsonKey(ignore: true)
   @override
@@ -1487,7 +1514,8 @@ class _$WorkflowFlutterConfigImpl implements _WorkflowFlutterConfig {
 abstract class _WorkflowFlutterConfig implements WorkflowFlutterConfig {
   const factory _WorkflowFlutterConfig(
       {required final Flavor flavor,
-      required final String version}) = _$WorkflowFlutterConfigImpl;
+      required final String version,
+      final List<String>? dartDefine}) = _$WorkflowFlutterConfigImpl;
 
   factory _WorkflowFlutterConfig.fromJson(Map<String, dynamic> json) =
       _$WorkflowFlutterConfigImpl.fromJson;
@@ -1496,6 +1524,8 @@ abstract class _WorkflowFlutterConfig implements WorkflowFlutterConfig {
   Flavor get flavor;
   @override
   String get version;
+  @override
+  List<String>? get dartDefine;
   @override
   @JsonKey(ignore: true)
   _$$WorkflowFlutterConfigImplCopyWith<_$WorkflowFlutterConfigImpl>

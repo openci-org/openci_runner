@@ -394,11 +394,13 @@ class RunnerCommand extends Command<int> {
               workflow.flutter.flavor,
               workflow.shorebird.token,
               workflow.flutter.version,
+              workflow.flutter.dartDefine,
             );
           } else {
             await ipaBuildService.buildIpa(
               organization.buildNumber.ios,
               workflow.flutter.flavor,
+              workflow.flutter.dartDefine,
             );
           }
 
@@ -439,6 +441,7 @@ class RunnerCommand extends Command<int> {
                 workflow.ios.appStoreConnectAPI?.issuerId,
               );
             case BuildDistributionChannel.playStoreInternal:
+            //
             case BuildDistributionChannel.playStoreBeta:
           }
 
