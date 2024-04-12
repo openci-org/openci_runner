@@ -371,7 +371,7 @@ class RunnerCommand extends Command<int> {
             jobId,
             vm.workingVMName,
             workflow.ios.teamId,
-            'for_app_store_0',
+            workflow.ios.provisioningProfile?.name,
           );
 
           final flutterVersionManager = FlutterVersionManager(
@@ -389,10 +389,6 @@ class RunnerCommand extends Command<int> {
 
           final useShorebird = workflow.shorebird.useShorebird;
           if (useShorebird != null && useShorebird == true) {
-            // 失敗しても、次のコマンドが実行されてしまうバグ continueを入れないといけない
-            // これは、try-catchで囲むべきかもしれない
-
-            // exitCodeが0の時は、stderrの文字色はsuccessに。
             await ipaBuildService.buildShorebirdIpa(
               organization.buildNumber.ios,
               workflow.flutter.flavor,

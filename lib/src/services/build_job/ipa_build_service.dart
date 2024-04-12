@@ -152,7 +152,7 @@ pod install;
 source ~/.zshrc;
 cd ~/Downloads/$_appName;
 export SHOREBIRD_TOKEN=$shorebirdToken;
-shorebird release ios -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist $flutterVersionArgument; 
+shorebird release ios $flutterVersionArgument -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist; 
 ''';
       default:
         throw Exception('Flavor must be specified');
