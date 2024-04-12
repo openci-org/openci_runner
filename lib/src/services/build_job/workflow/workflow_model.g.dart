@@ -85,6 +85,7 @@ _$WorkflowIosConfigImpl _$$WorkflowIosConfigImplFromJson(
           ? null
           : WorkflowAppStoreConnectAPI.fromJson(
               json['appStoreConnectAPI'] as Map<String, dynamic>),
+      teamId: json['teamId'] as String? ?? null,
     );
 
 Map<String, dynamic> _$$WorkflowIosConfigImplToJson(
@@ -94,6 +95,7 @@ Map<String, dynamic> _$$WorkflowIosConfigImplToJson(
       'p12': instance.p12,
       'provisioningProfile': instance.provisioningProfile,
       'appStoreConnectAPI': instance.appStoreConnectAPI,
+      'teamId': instance.teamId,
     };
 
 _$WorkflowAppStoreConnectAPIImpl _$$WorkflowAppStoreConnectAPIImplFromJson(

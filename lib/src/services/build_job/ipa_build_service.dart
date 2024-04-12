@@ -244,4 +244,41 @@ xcrun altool --upload-app -f $path --type ios --apiKey $appStoreConnectKeyId --a
       _workingVMName,
     );
   }
+
+  Future<void> getRubyScripts(
+    SSHShellService sshShellService,
+    SSHClient sshClient,
+    String jobId,
+    String workingVMName,
+  ) async {
+    await sshShellService.executeCommand(
+      'cd ~/Downloads && git clone https://github.com/open-ci-io/xcodeproj_scripts.git',
+      sshClient,
+      jobId,
+      workingVMName,
+    );
+  }
+
+  Future<void> setProvisioningProfile(
+    SSHShellService sshShellService,
+    SSHClient sshClient,
+    String jobId,
+    String workingVMName,
+    String? teamId,
+    String? provisioningProfileName,
+  ) async {
+    if (teamId == null) {
+      throw Exception('Team ID is required');
+    }
+    if (provisioningProfileName == null) {
+      throw Exception('Provisioning Profile Name is required');
+    }
+    await sshShellService.executeCommand(
+      // TODO(someone): xcodeproj is installed macOS vm but, openci can't recognize it.
+      'cd ~/Downloads/ && sudo gem install xcodeproj && ruby xcodeproj_scripts/change_provisioning_profile.rb ~/Downloads/$_appName/ios/Runner.xcodeproj $teamId $provisioningProfileName',
+      sshClient,
+      jobId,
+      workingVMName,
+    );
+  }
 }

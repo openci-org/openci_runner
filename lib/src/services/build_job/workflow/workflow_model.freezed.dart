@@ -732,6 +732,7 @@ mixin _$WorkflowIosConfig {
       throw _privateConstructorUsedError;
   WorkflowAppStoreConnectAPI? get appStoreConnectAPI =>
       throw _privateConstructorUsedError;
+  String? get teamId => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -749,7 +750,8 @@ abstract class $WorkflowIosConfigCopyWith<$Res> {
       {String? exportOptions,
       String? p12,
       WorkflowProvisioningProfileConfig? provisioningProfile,
-      WorkflowAppStoreConnectAPI? appStoreConnectAPI});
+      WorkflowAppStoreConnectAPI? appStoreConnectAPI,
+      String? teamId});
 
   $WorkflowProvisioningProfileConfigCopyWith<$Res>? get provisioningProfile;
   $WorkflowAppStoreConnectAPICopyWith<$Res>? get appStoreConnectAPI;
@@ -772,6 +774,7 @@ class _$WorkflowIosConfigCopyWithImpl<$Res, $Val extends WorkflowIosConfig>
     Object? p12 = freezed,
     Object? provisioningProfile = freezed,
     Object? appStoreConnectAPI = freezed,
+    Object? teamId = freezed,
   }) {
     return _then(_value.copyWith(
       exportOptions: freezed == exportOptions
@@ -790,6 +793,10 @@ class _$WorkflowIosConfigCopyWithImpl<$Res, $Val extends WorkflowIosConfig>
           ? _value.appStoreConnectAPI
           : appStoreConnectAPI // ignore: cast_nullable_to_non_nullable
               as WorkflowAppStoreConnectAPI?,
+      teamId: freezed == teamId
+          ? _value.teamId
+          : teamId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 
@@ -832,7 +839,8 @@ abstract class _$$WorkflowIosConfigImplCopyWith<$Res>
       {String? exportOptions,
       String? p12,
       WorkflowProvisioningProfileConfig? provisioningProfile,
-      WorkflowAppStoreConnectAPI? appStoreConnectAPI});
+      WorkflowAppStoreConnectAPI? appStoreConnectAPI,
+      String? teamId});
 
   @override
   $WorkflowProvisioningProfileConfigCopyWith<$Res>? get provisioningProfile;
@@ -855,6 +863,7 @@ class __$$WorkflowIosConfigImplCopyWithImpl<$Res>
     Object? p12 = freezed,
     Object? provisioningProfile = freezed,
     Object? appStoreConnectAPI = freezed,
+    Object? teamId = freezed,
   }) {
     return _then(_$WorkflowIosConfigImpl(
       exportOptions: freezed == exportOptions
@@ -873,6 +882,10 @@ class __$$WorkflowIosConfigImplCopyWithImpl<$Res>
           ? _value.appStoreConnectAPI
           : appStoreConnectAPI // ignore: cast_nullable_to_non_nullable
               as WorkflowAppStoreConnectAPI?,
+      teamId: freezed == teamId
+          ? _value.teamId
+          : teamId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -884,7 +897,8 @@ class _$WorkflowIosConfigImpl implements _WorkflowIosConfig {
       {this.exportOptions = null,
       this.p12 = null,
       this.provisioningProfile = null,
-      this.appStoreConnectAPI = null});
+      this.appStoreConnectAPI = null,
+      this.teamId = null});
 
   factory _$WorkflowIosConfigImpl.fromJson(Map<String, dynamic> json) =>
       _$$WorkflowIosConfigImplFromJson(json);
@@ -901,10 +915,13 @@ class _$WorkflowIosConfigImpl implements _WorkflowIosConfig {
   @override
   @JsonKey()
   final WorkflowAppStoreConnectAPI? appStoreConnectAPI;
+  @override
+  @JsonKey()
+  final String? teamId;
 
   @override
   String toString() {
-    return 'WorkflowIosConfig(exportOptions: $exportOptions, p12: $p12, provisioningProfile: $provisioningProfile, appStoreConnectAPI: $appStoreConnectAPI)';
+    return 'WorkflowIosConfig(exportOptions: $exportOptions, p12: $p12, provisioningProfile: $provisioningProfile, appStoreConnectAPI: $appStoreConnectAPI, teamId: $teamId)';
   }
 
   @override
@@ -918,13 +935,14 @@ class _$WorkflowIosConfigImpl implements _WorkflowIosConfig {
             (identical(other.provisioningProfile, provisioningProfile) ||
                 other.provisioningProfile == provisioningProfile) &&
             (identical(other.appStoreConnectAPI, appStoreConnectAPI) ||
-                other.appStoreConnectAPI == appStoreConnectAPI));
+                other.appStoreConnectAPI == appStoreConnectAPI) &&
+            (identical(other.teamId, teamId) || other.teamId == teamId));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, exportOptions, p12, provisioningProfile, appStoreConnectAPI);
+  int get hashCode => Object.hash(runtimeType, exportOptions, p12,
+      provisioningProfile, appStoreConnectAPI, teamId);
 
   @JsonKey(ignore: true)
   @override
@@ -943,11 +961,11 @@ class _$WorkflowIosConfigImpl implements _WorkflowIosConfig {
 
 abstract class _WorkflowIosConfig implements WorkflowIosConfig {
   const factory _WorkflowIosConfig(
-          {final String? exportOptions,
-          final String? p12,
-          final WorkflowProvisioningProfileConfig? provisioningProfile,
-          final WorkflowAppStoreConnectAPI? appStoreConnectAPI}) =
-      _$WorkflowIosConfigImpl;
+      {final String? exportOptions,
+      final String? p12,
+      final WorkflowProvisioningProfileConfig? provisioningProfile,
+      final WorkflowAppStoreConnectAPI? appStoreConnectAPI,
+      final String? teamId}) = _$WorkflowIosConfigImpl;
 
   factory _WorkflowIosConfig.fromJson(Map<String, dynamic> json) =
       _$WorkflowIosConfigImpl.fromJson;
@@ -960,6 +978,8 @@ abstract class _WorkflowIosConfig implements WorkflowIosConfig {
   WorkflowProvisioningProfileConfig? get provisioningProfile;
   @override
   WorkflowAppStoreConnectAPI? get appStoreConnectAPI;
+  @override
+  String? get teamId;
   @override
   @JsonKey(ignore: true)
   _$$WorkflowIosConfigImplCopyWith<_$WorkflowIosConfigImpl> get copyWith =>

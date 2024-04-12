@@ -48,6 +48,7 @@ class WorkflowIosConfig with _$WorkflowIosConfig {
     @Default(null) String? p12,
     @Default(null) WorkflowProvisioningProfileConfig? provisioningProfile,
     @Default(null) WorkflowAppStoreConnectAPI? appStoreConnectAPI,
+    @Default(null) String? teamId,
   }) = _WorkflowIosConfig;
   factory WorkflowIosConfig.fromJson(Map<String, Object?> json) =>
       _$WorkflowIosConfigFromJson(json);

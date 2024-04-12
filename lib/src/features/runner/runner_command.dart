@@ -346,15 +346,6 @@ class RunnerCommand extends Command<int> {
             tokenId,
           );
 
-          await buildUtilityService.changeProvisioningProfile(
-            sshShellService,
-            appName,
-            sshClient,
-            jobId,
-            vm.workingVMName,
-            workflow.ios.provisioningProfile?.name,
-          );
-
           await ipaBuildService.downloadExportOptionsPlist(
             workflow.ios.exportOptions,
           );
@@ -366,6 +357,22 @@ class RunnerCommand extends Command<int> {
             workflow.ios.provisioningProfile?.url,
           );
           await ipaBuildService.importCertificates();
+
+          await ipaBuildService.getRubyScripts(
+            sshShellService,
+            sshClient,
+            jobId,
+            vm.workingVMName,
+          );
+
+          await ipaBuildService.setProvisioningProfile(
+            sshShellService,
+            sshClient,
+            jobId,
+            vm.workingVMName,
+            workflow.ios.teamId,
+            'for_app_store_0',
+          );
 
           final flutterVersionManager = FlutterVersionManager(
             sshShellService,

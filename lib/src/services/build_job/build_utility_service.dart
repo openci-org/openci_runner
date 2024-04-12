@@ -106,26 +106,4 @@ class BuildUtilityService {
       'buildStatus.success': true,
     });
   }
-
-  Future<void> changeProvisioningProfile(
-    SSHShellService sshShellService,
-    String appName,
-    SSHClient sshClient,
-    String jobId,
-    String workingVMName,
-    String? provisioningProfileName,
-  ) async {
-    if (provisioningProfileName == null) {
-      throw Exception('Provisioning Profile Name is required');
-    }
-    await sshShellService.executeCommand(
-      '''
-cd ~/Downloads/$appName/ios/Runner.xcodeproj/;
-sed -i '' 's/"PROVISIONING_PROFILE_SPECIFIER\\[sdk=iphoneos\\*\\]" = .*;/"PROVISIONING_PROFILE_SPECIFIER\\[sdk=iphoneos\\*\\]" = "$provisioningProfileName";/g' project.pbxproj
-''',
-      sshClient,
-      jobId,
-      workingVMName,
-    );
-  }
 }
