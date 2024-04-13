@@ -9,11 +9,11 @@ class WorkflowModel with _$WorkflowModel {
   const factory WorkflowModel({
     required WorkflowFirebaseConfig firebase,
     required WorkflowIosConfig ios,
-    required BuildDistributionChannel distribution,
     required String organizationId,
     required WorkflowFlutterConfig flutter,
     required WorkflowShorebirdConfig shorebird,
     required String workflowName,
+    @Default(null) BuildDistributionChannel? distribution,
   }) = _WorkflowModel;
   factory WorkflowModel.fromJson(Map<String, Object?> json) =>
       _$WorkflowModelFromJson(json);
@@ -25,6 +25,7 @@ class WorkflowShorebirdConfig with _$WorkflowShorebirdConfig {
     @Default(null) String? token,
     @Default(null) String? yamlDownloadUrl,
     @Default(null) bool? useShorebird,
+    @Default(null) bool? patch,
   }) = _WorkflowShorebirdConfig;
   factory WorkflowShorebirdConfig.fromJson(Map<String, Object?> json) =>
       _$WorkflowShorebirdConfigFromJson(json);
@@ -60,6 +61,7 @@ class WorkflowAppStoreConnectAPI with _$WorkflowAppStoreConnectAPI {
     @Default(null) String? p8,
     @Default(null) String? keyId,
     @Default(null) String? issuerId,
+    @Default(null) String? appId,
   }) = _WorkflowAppStoreConnectAPI;
   factory WorkflowAppStoreConnectAPI.fromJson(Map<String, Object?> json) =>
       _$WorkflowAppStoreConnectAPIFromJson(json);

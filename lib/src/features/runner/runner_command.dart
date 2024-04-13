@@ -388,69 +388,91 @@ class RunnerCommand extends Command<int> {
           await ipaBuildService.runCustomScripts();
 
           final useShorebird = workflow.shorebird.useShorebird;
-          if (useShorebird != null && useShorebird == true) {
-            await ipaBuildService.buildShorebirdIpa(
-              organization.buildNumber.ios,
+          final patch = workflow.shorebird.patch;
+          if (patch != null && patch) {
+            final privateKey = await ipaBuildService
+                .fetchPrivateKey(workflow.ios.appStoreConnectAPI?.p8);
+            final data =
+                await ipaBuildService.getLatestAppVersionAndBuildNumber(
+              workflow.ios.appStoreConnectAPI?.appId,
+              workflow.ios.appStoreConnectAPI?.keyId,
+              workflow.ios.appStoreConnectAPI?.issuerId,
+              privateKey,
+            );
+
+            await ipaBuildService.patchShorebirdIpa(
+              int.parse(data['buildNumber'].toString()),
               workflow.flutter.flavor,
               workflow.shorebird.token,
-              workflow.flutter.version,
               workflow.flutter.dartDefine,
             );
           } else {
-            await ipaBuildService.buildIpa(
-              organization.buildNumber.ios,
-              workflow.flutter.flavor,
-              workflow.flutter.dartDefine,
+            if (useShorebird != null && useShorebird == true) {
+              await ipaBuildService.buildShorebirdIpa(
+                organization.buildNumber.ios,
+                workflow.flutter.flavor,
+                workflow.shorebird.token,
+                workflow.flutter.version,
+                workflow.flutter.dartDefine,
+              );
+            } else {
+              await ipaBuildService.buildIpa(
+                organization.buildNumber.ios,
+                workflow.flutter.flavor,
+                workflow.flutter.dartDefine,
+              );
+            }
+
+            _logger.success('ipa build success');
+
+            // 以下はBuildDistributionServiceにした方がいいかも。
+            // Prepare for distribution
+            final distribution = workflow.distribution;
+
+            switch (distribution) {
+              case BuildDistributionChannel.firebaseAppDistribution:
+                final serviceAccountJsonDownloadUrl =
+                    workflow.firebase.serviceAccountJson;
+                if (serviceAccountJsonDownloadUrl == null) {
+                  throw Exception('Service account json download url is null');
+                }
+                await buildUtilityService.importServiceAccountJson(
+                  appConfig.firebaseServiceAccountJson,
+                  sshShellService,
+                  sshClient,
+                  jobId,
+                  vm.workingVMName,
+                  appName,
+                  serviceAccountJsonDownloadUrl,
+                );
+                await ipaBuildService.uploadIpaToFirebaseAppDistribution(
+                  workflow.firebase.appIdIos,
+                  workflow.firebase.appDistribution.testerGroups,
+                );
+                _logger.success('upload build success');
+              case BuildDistributionChannel.testFlight:
+                await ipaBuildService.downloadP8(
+                  workflow.ios.appStoreConnectAPI?.p8,
+                  workflow.ios.appStoreConnectAPI?.keyId,
+                );
+                await ipaBuildService.uploadIpaToTestFlight(
+                  workflow.ios.appStoreConnectAPI?.keyId,
+                  workflow.ios.appStoreConnectAPI?.issuerId,
+                );
+              case BuildDistributionChannel.playStoreInternal:
+              //
+              case BuildDistributionChannel.playStoreBeta:
+              case null:
+              // TODO: Handle this case.
+            }
+
+            await buildUtilityService.incrementBuildNumber(
+              organization.documentId,
+              organization.buildNumber,
+              TargetPlatform.ios,
             );
+            _logger.success('ios buildNumber update success');
           }
-
-          _logger.success('ipa build success');
-
-          // 以下はBuildDistributionServiceにした方がいいかも。
-          // Prepare for distribution
-          final distribution = workflow.distribution;
-
-          switch (distribution) {
-            case BuildDistributionChannel.firebaseAppDistribution:
-              final serviceAccountJsonDownloadUrl =
-                  workflow.firebase.serviceAccountJson;
-              if (serviceAccountJsonDownloadUrl == null) {
-                throw Exception('Service account json download url is null');
-              }
-              await buildUtilityService.importServiceAccountJson(
-                appConfig.firebaseServiceAccountJson,
-                sshShellService,
-                sshClient,
-                jobId,
-                vm.workingVMName,
-                appName,
-                serviceAccountJsonDownloadUrl,
-              );
-              await ipaBuildService.uploadIpaToFirebaseAppDistribution(
-                workflow.firebase.appIdIos,
-                workflow.firebase.appDistribution.testerGroups,
-              );
-              _logger.success('upload build success');
-            case BuildDistributionChannel.testFlight:
-              await ipaBuildService.downloadP8(
-                workflow.ios.appStoreConnectAPI?.p8,
-                workflow.ios.appStoreConnectAPI?.keyId,
-              );
-              await ipaBuildService.uploadIpaToTestFlight(
-                workflow.ios.appStoreConnectAPI?.keyId,
-                workflow.ios.appStoreConnectAPI?.issuerId,
-              );
-            case BuildDistributionChannel.playStoreInternal:
-            //
-            case BuildDistributionChannel.playStoreBeta:
-          }
-
-          await buildUtilityService.incrementBuildNumber(
-            organization.documentId,
-            organization.buildNumber,
-            TargetPlatform.ios,
-          );
-          _logger.success('ios buildNumber update success');
 
           await buildUtilityService.markJobAsSuccess(jobId);
           _logger.success('whole build process completed');

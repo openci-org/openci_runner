@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:dartssh2/dartssh2.dart';
 import 'package:openci_runner/src/features/user/domain/user_data.dart';
 import 'package:openci_runner/src/services/macos/directory_paths.dart';
 import 'package:openci_runner/src/services/shell/shell_result.dart';
 import 'package:openci_runner/src/services/shell/ssh_shell_service.dart';
+
+import 'package:http/http.dart' as http;
 
 class IpaBuildService {
   IpaBuildService(
@@ -140,6 +144,35 @@ pod install;
     );
   }
 
+  Future<ShellResult> patchShorebirdIpa(
+    int iosBuildNumber,
+    Flavor flavor,
+    String? shorebirdToken,
+    List<String>? dartDefines,
+  ) async {
+    if (shorebirdToken == null) {
+      throw Exception('Shorebird token is required');
+    }
+    var command = '';
+    switch (flavor) {
+      case Flavor.none:
+        command = '''
+source ~/.zshrc;
+cd ~/Downloads/$_appName;
+export SHOREBIRD_TOKEN=$shorebirdToken;
+shorebird patch ios -y -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist ${_generateDartDefines(dartDefines)}; 
+''';
+      default:
+        throw Exception('Flavor must be specified');
+    }
+    return _sshShellService.executeCommand(
+      command,
+      _sshClient,
+      _jobId,
+      _workingVMName,
+    );
+  }
+
   Future<ShellResult> buildShorebirdIpa(
     int iosBuildNumber,
     Flavor flavor,
@@ -233,6 +266,23 @@ curl -L -o $fileName "$downloadUrl";
     );
   }
 
+  Future<String> fetchPrivateKey(
+    String? downloadUrl,
+  ) async {
+    if (downloadUrl == null) {
+      throw Exception('Download URL is required');
+    }
+    final result = await _sshShellService.executeCommand(
+      '''
+curl -sL "$downloadUrl"
+''',
+      _sshClient,
+      _jobId,
+      _workingVMName,
+    );
+    return result.sessionResult.sessionStdout;
+  }
+
   Future<void> uploadIpaToTestFlight(
     String? appStoreConnectKeyId,
     String? appStoreConnectIssuerId,
@@ -289,5 +339,45 @@ xcrun altool --upload-app -f $path --type ios --apiKey $appStoreConnectKeyId --a
       jobId,
       workingVMName,
     );
+  }
+
+  Future<Map<String, dynamic>> getLatestAppVersionAndBuildNumber(
+    String? appId,
+    String? keyId,
+    String? issuerId,
+    String? privateKey,
+  ) async {
+    if (appId == null ||
+        keyId == null ||
+        issuerId == null ||
+        privateKey == null) {
+      throw Exception(
+        'appId: $appId keyId: $keyId issuerId: $issuerId privateKey: $privateKey are null',
+      );
+    }
+
+    const url =
+        'https://getlatestbuildversionandnumber-wvluvdjkzq-uc.a.run.app';
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'keyId': keyId,
+        'appId': appId,
+        'issuerId': issuerId,
+        'privateKey': privateKey,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      print('data: $data');
+      return data;
+    } else {
+      throw Exception(
+        'Failed to get installation token. Status code: ${response.statusCode}',
+      );
+    }
   }
 }

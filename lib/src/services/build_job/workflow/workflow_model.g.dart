@@ -11,25 +11,26 @@ _$WorkflowModelImpl _$$WorkflowModelImplFromJson(Map<String, dynamic> json) =>
       firebase: WorkflowFirebaseConfig.fromJson(
           json['firebase'] as Map<String, dynamic>),
       ios: WorkflowIosConfig.fromJson(json['ios'] as Map<String, dynamic>),
-      distribution:
-          $enumDecode(_$BuildDistributionChannelEnumMap, json['distribution']),
       organizationId: json['organizationId'] as String,
       flutter: WorkflowFlutterConfig.fromJson(
           json['flutter'] as Map<String, dynamic>),
       shorebird: WorkflowShorebirdConfig.fromJson(
           json['shorebird'] as Map<String, dynamic>),
       workflowName: json['workflowName'] as String,
+      distribution: $enumDecodeNullable(
+              _$BuildDistributionChannelEnumMap, json['distribution']) ??
+          null,
     );
 
 Map<String, dynamic> _$$WorkflowModelImplToJson(_$WorkflowModelImpl instance) =>
     <String, dynamic>{
       'firebase': instance.firebase,
       'ios': instance.ios,
-      'distribution': _$BuildDistributionChannelEnumMap[instance.distribution]!,
       'organizationId': instance.organizationId,
       'flutter': instance.flutter,
       'shorebird': instance.shorebird,
       'workflowName': instance.workflowName,
+      'distribution': _$BuildDistributionChannelEnumMap[instance.distribution],
     };
 
 const _$BuildDistributionChannelEnumMap = {
@@ -45,6 +46,7 @@ _$WorkflowShorebirdConfigImpl _$$WorkflowShorebirdConfigImplFromJson(
       token: json['token'] as String? ?? null,
       yamlDownloadUrl: json['yamlDownloadUrl'] as String? ?? null,
       useShorebird: json['useShorebird'] as bool? ?? null,
+      patch: json['patch'] as bool? ?? null,
     );
 
 Map<String, dynamic> _$$WorkflowShorebirdConfigImplToJson(
@@ -53,6 +55,7 @@ Map<String, dynamic> _$$WorkflowShorebirdConfigImplToJson(
       'token': instance.token,
       'yamlDownloadUrl': instance.yamlDownloadUrl,
       'useShorebird': instance.useShorebird,
+      'patch': instance.patch,
     };
 
 _$WorkflowFirebaseConfigImpl _$$WorkflowFirebaseConfigImplFromJson(
@@ -104,6 +107,7 @@ _$WorkflowAppStoreConnectAPIImpl _$$WorkflowAppStoreConnectAPIImplFromJson(
       p8: json['p8'] as String? ?? null,
       keyId: json['keyId'] as String? ?? null,
       issuerId: json['issuerId'] as String? ?? null,
+      appId: json['appId'] as String? ?? null,
     );
 
 Map<String, dynamic> _$$WorkflowAppStoreConnectAPIImplToJson(
@@ -112,6 +116,7 @@ Map<String, dynamic> _$$WorkflowAppStoreConnectAPIImplToJson(
       'p8': instance.p8,
       'keyId': instance.keyId,
       'issuerId': instance.issuerId,
+      'appId': instance.appId,
     };
 
 _$WorkflowProvisioningProfileConfigImpl

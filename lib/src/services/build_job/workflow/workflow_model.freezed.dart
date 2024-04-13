@@ -22,12 +22,12 @@ WorkflowModel _$WorkflowModelFromJson(Map<String, dynamic> json) {
 mixin _$WorkflowModel {
   WorkflowFirebaseConfig get firebase => throw _privateConstructorUsedError;
   WorkflowIosConfig get ios => throw _privateConstructorUsedError;
-  BuildDistributionChannel get distribution =>
-      throw _privateConstructorUsedError;
   String get organizationId => throw _privateConstructorUsedError;
   WorkflowFlutterConfig get flutter => throw _privateConstructorUsedError;
   WorkflowShorebirdConfig get shorebird => throw _privateConstructorUsedError;
   String get workflowName => throw _privateConstructorUsedError;
+  BuildDistributionChannel? get distribution =>
+      throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -44,11 +44,11 @@ abstract class $WorkflowModelCopyWith<$Res> {
   $Res call(
       {WorkflowFirebaseConfig firebase,
       WorkflowIosConfig ios,
-      BuildDistributionChannel distribution,
       String organizationId,
       WorkflowFlutterConfig flutter,
       WorkflowShorebirdConfig shorebird,
-      String workflowName});
+      String workflowName,
+      BuildDistributionChannel? distribution});
 
   $WorkflowFirebaseConfigCopyWith<$Res> get firebase;
   $WorkflowIosConfigCopyWith<$Res> get ios;
@@ -71,11 +71,11 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
   $Res call({
     Object? firebase = null,
     Object? ios = null,
-    Object? distribution = null,
     Object? organizationId = null,
     Object? flutter = null,
     Object? shorebird = null,
     Object? workflowName = null,
+    Object? distribution = freezed,
   }) {
     return _then(_value.copyWith(
       firebase: null == firebase
@@ -86,10 +86,6 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
           ? _value.ios
           : ios // ignore: cast_nullable_to_non_nullable
               as WorkflowIosConfig,
-      distribution: null == distribution
-          ? _value.distribution
-          : distribution // ignore: cast_nullable_to_non_nullable
-              as BuildDistributionChannel,
       organizationId: null == organizationId
           ? _value.organizationId
           : organizationId // ignore: cast_nullable_to_non_nullable
@@ -106,6 +102,10 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
           ? _value.workflowName
           : workflowName // ignore: cast_nullable_to_non_nullable
               as String,
+      distribution: freezed == distribution
+          ? _value.distribution
+          : distribution // ignore: cast_nullable_to_non_nullable
+              as BuildDistributionChannel?,
     ) as $Val);
   }
 
@@ -153,11 +153,11 @@ abstract class _$$WorkflowModelImplCopyWith<$Res>
   $Res call(
       {WorkflowFirebaseConfig firebase,
       WorkflowIosConfig ios,
-      BuildDistributionChannel distribution,
       String organizationId,
       WorkflowFlutterConfig flutter,
       WorkflowShorebirdConfig shorebird,
-      String workflowName});
+      String workflowName,
+      BuildDistributionChannel? distribution});
 
   @override
   $WorkflowFirebaseConfigCopyWith<$Res> get firebase;
@@ -182,11 +182,11 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
   $Res call({
     Object? firebase = null,
     Object? ios = null,
-    Object? distribution = null,
     Object? organizationId = null,
     Object? flutter = null,
     Object? shorebird = null,
     Object? workflowName = null,
+    Object? distribution = freezed,
   }) {
     return _then(_$WorkflowModelImpl(
       firebase: null == firebase
@@ -197,10 +197,6 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
           ? _value.ios
           : ios // ignore: cast_nullable_to_non_nullable
               as WorkflowIosConfig,
-      distribution: null == distribution
-          ? _value.distribution
-          : distribution // ignore: cast_nullable_to_non_nullable
-              as BuildDistributionChannel,
       organizationId: null == organizationId
           ? _value.organizationId
           : organizationId // ignore: cast_nullable_to_non_nullable
@@ -217,6 +213,10 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
           ? _value.workflowName
           : workflowName // ignore: cast_nullable_to_non_nullable
               as String,
+      distribution: freezed == distribution
+          ? _value.distribution
+          : distribution // ignore: cast_nullable_to_non_nullable
+              as BuildDistributionChannel?,
     ));
   }
 }
@@ -227,11 +227,11 @@ class _$WorkflowModelImpl implements _WorkflowModel {
   const _$WorkflowModelImpl(
       {required this.firebase,
       required this.ios,
-      required this.distribution,
       required this.organizationId,
       required this.flutter,
       required this.shorebird,
-      required this.workflowName});
+      required this.workflowName,
+      this.distribution = null});
 
   factory _$WorkflowModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$WorkflowModelImplFromJson(json);
@@ -241,8 +241,6 @@ class _$WorkflowModelImpl implements _WorkflowModel {
   @override
   final WorkflowIosConfig ios;
   @override
-  final BuildDistributionChannel distribution;
-  @override
   final String organizationId;
   @override
   final WorkflowFlutterConfig flutter;
@@ -250,10 +248,13 @@ class _$WorkflowModelImpl implements _WorkflowModel {
   final WorkflowShorebirdConfig shorebird;
   @override
   final String workflowName;
+  @override
+  @JsonKey()
+  final BuildDistributionChannel? distribution;
 
   @override
   String toString() {
-    return 'WorkflowModel(firebase: $firebase, ios: $ios, distribution: $distribution, organizationId: $organizationId, flutter: $flutter, shorebird: $shorebird, workflowName: $workflowName)';
+    return 'WorkflowModel(firebase: $firebase, ios: $ios, organizationId: $organizationId, flutter: $flutter, shorebird: $shorebird, workflowName: $workflowName, distribution: $distribution)';
   }
 
   @override
@@ -264,21 +265,21 @@ class _$WorkflowModelImpl implements _WorkflowModel {
             (identical(other.firebase, firebase) ||
                 other.firebase == firebase) &&
             (identical(other.ios, ios) || other.ios == ios) &&
-            (identical(other.distribution, distribution) ||
-                other.distribution == distribution) &&
             (identical(other.organizationId, organizationId) ||
                 other.organizationId == organizationId) &&
             (identical(other.flutter, flutter) || other.flutter == flutter) &&
             (identical(other.shorebird, shorebird) ||
                 other.shorebird == shorebird) &&
             (identical(other.workflowName, workflowName) ||
-                other.workflowName == workflowName));
+                other.workflowName == workflowName) &&
+            (identical(other.distribution, distribution) ||
+                other.distribution == distribution));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, firebase, ios, distribution,
-      organizationId, flutter, shorebird, workflowName);
+  int get hashCode => Object.hash(runtimeType, firebase, ios, organizationId,
+      flutter, shorebird, workflowName, distribution);
 
   @JsonKey(ignore: true)
   @override
@@ -298,11 +299,11 @@ abstract class _WorkflowModel implements WorkflowModel {
   const factory _WorkflowModel(
       {required final WorkflowFirebaseConfig firebase,
       required final WorkflowIosConfig ios,
-      required final BuildDistributionChannel distribution,
       required final String organizationId,
       required final WorkflowFlutterConfig flutter,
       required final WorkflowShorebirdConfig shorebird,
-      required final String workflowName}) = _$WorkflowModelImpl;
+      required final String workflowName,
+      final BuildDistributionChannel? distribution}) = _$WorkflowModelImpl;
 
   factory _WorkflowModel.fromJson(Map<String, dynamic> json) =
       _$WorkflowModelImpl.fromJson;
@@ -312,8 +313,6 @@ abstract class _WorkflowModel implements WorkflowModel {
   @override
   WorkflowIosConfig get ios;
   @override
-  BuildDistributionChannel get distribution;
-  @override
   String get organizationId;
   @override
   WorkflowFlutterConfig get flutter;
@@ -321,6 +320,8 @@ abstract class _WorkflowModel implements WorkflowModel {
   WorkflowShorebirdConfig get shorebird;
   @override
   String get workflowName;
+  @override
+  BuildDistributionChannel? get distribution;
   @override
   @JsonKey(ignore: true)
   _$$WorkflowModelImplCopyWith<_$WorkflowModelImpl> get copyWith =>
@@ -337,6 +338,7 @@ mixin _$WorkflowShorebirdConfig {
   String? get token => throw _privateConstructorUsedError;
   String? get yamlDownloadUrl => throw _privateConstructorUsedError;
   bool? get useShorebird => throw _privateConstructorUsedError;
+  bool? get patch => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -350,7 +352,11 @@ abstract class $WorkflowShorebirdConfigCopyWith<$Res> {
           $Res Function(WorkflowShorebirdConfig) then) =
       _$WorkflowShorebirdConfigCopyWithImpl<$Res, WorkflowShorebirdConfig>;
   @useResult
-  $Res call({String? token, String? yamlDownloadUrl, bool? useShorebird});
+  $Res call(
+      {String? token,
+      String? yamlDownloadUrl,
+      bool? useShorebird,
+      bool? patch});
 }
 
 /// @nodoc
@@ -370,6 +376,7 @@ class _$WorkflowShorebirdConfigCopyWithImpl<$Res,
     Object? token = freezed,
     Object? yamlDownloadUrl = freezed,
     Object? useShorebird = freezed,
+    Object? patch = freezed,
   }) {
     return _then(_value.copyWith(
       token: freezed == token
@@ -384,6 +391,10 @@ class _$WorkflowShorebirdConfigCopyWithImpl<$Res,
           ? _value.useShorebird
           : useShorebird // ignore: cast_nullable_to_non_nullable
               as bool?,
+      patch: freezed == patch
+          ? _value.patch
+          : patch // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ) as $Val);
   }
 }
@@ -397,7 +408,11 @@ abstract class _$$WorkflowShorebirdConfigImplCopyWith<$Res>
       __$$WorkflowShorebirdConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? token, String? yamlDownloadUrl, bool? useShorebird});
+  $Res call(
+      {String? token,
+      String? yamlDownloadUrl,
+      bool? useShorebird,
+      bool? patch});
 }
 
 /// @nodoc
@@ -416,6 +431,7 @@ class __$$WorkflowShorebirdConfigImplCopyWithImpl<$Res>
     Object? token = freezed,
     Object? yamlDownloadUrl = freezed,
     Object? useShorebird = freezed,
+    Object? patch = freezed,
   }) {
     return _then(_$WorkflowShorebirdConfigImpl(
       token: freezed == token
@@ -430,6 +446,10 @@ class __$$WorkflowShorebirdConfigImplCopyWithImpl<$Res>
           ? _value.useShorebird
           : useShorebird // ignore: cast_nullable_to_non_nullable
               as bool?,
+      patch: freezed == patch
+          ? _value.patch
+          : patch // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ));
   }
 }
@@ -440,7 +460,8 @@ class _$WorkflowShorebirdConfigImpl implements _WorkflowShorebirdConfig {
   const _$WorkflowShorebirdConfigImpl(
       {this.token = null,
       this.yamlDownloadUrl = null,
-      this.useShorebird = null});
+      this.useShorebird = null,
+      this.patch = null});
 
   factory _$WorkflowShorebirdConfigImpl.fromJson(Map<String, dynamic> json) =>
       _$$WorkflowShorebirdConfigImplFromJson(json);
@@ -454,10 +475,13 @@ class _$WorkflowShorebirdConfigImpl implements _WorkflowShorebirdConfig {
   @override
   @JsonKey()
   final bool? useShorebird;
+  @override
+  @JsonKey()
+  final bool? patch;
 
   @override
   String toString() {
-    return 'WorkflowShorebirdConfig(token: $token, yamlDownloadUrl: $yamlDownloadUrl, useShorebird: $useShorebird)';
+    return 'WorkflowShorebirdConfig(token: $token, yamlDownloadUrl: $yamlDownloadUrl, useShorebird: $useShorebird, patch: $patch)';
   }
 
   @override
@@ -469,13 +493,14 @@ class _$WorkflowShorebirdConfigImpl implements _WorkflowShorebirdConfig {
             (identical(other.yamlDownloadUrl, yamlDownloadUrl) ||
                 other.yamlDownloadUrl == yamlDownloadUrl) &&
             (identical(other.useShorebird, useShorebird) ||
-                other.useShorebird == useShorebird));
+                other.useShorebird == useShorebird) &&
+            (identical(other.patch, patch) || other.patch == patch));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, token, yamlDownloadUrl, useShorebird);
+      Object.hash(runtimeType, token, yamlDownloadUrl, useShorebird, patch);
 
   @JsonKey(ignore: true)
   @override
@@ -496,7 +521,8 @@ abstract class _WorkflowShorebirdConfig implements WorkflowShorebirdConfig {
   const factory _WorkflowShorebirdConfig(
       {final String? token,
       final String? yamlDownloadUrl,
-      final bool? useShorebird}) = _$WorkflowShorebirdConfigImpl;
+      final bool? useShorebird,
+      final bool? patch}) = _$WorkflowShorebirdConfigImpl;
 
   factory _WorkflowShorebirdConfig.fromJson(Map<String, dynamic> json) =
       _$WorkflowShorebirdConfigImpl.fromJson;
@@ -507,6 +533,8 @@ abstract class _WorkflowShorebirdConfig implements WorkflowShorebirdConfig {
   String? get yamlDownloadUrl;
   @override
   bool? get useShorebird;
+  @override
+  bool? get patch;
   @override
   @JsonKey(ignore: true)
   _$$WorkflowShorebirdConfigImplCopyWith<_$WorkflowShorebirdConfigImpl>
@@ -996,6 +1024,7 @@ mixin _$WorkflowAppStoreConnectAPI {
   String? get p8 => throw _privateConstructorUsedError;
   String? get keyId => throw _privateConstructorUsedError;
   String? get issuerId => throw _privateConstructorUsedError;
+  String? get appId => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1010,7 +1039,7 @@ abstract class $WorkflowAppStoreConnectAPICopyWith<$Res> {
       _$WorkflowAppStoreConnectAPICopyWithImpl<$Res,
           WorkflowAppStoreConnectAPI>;
   @useResult
-  $Res call({String? p8, String? keyId, String? issuerId});
+  $Res call({String? p8, String? keyId, String? issuerId, String? appId});
 }
 
 /// @nodoc
@@ -1030,6 +1059,7 @@ class _$WorkflowAppStoreConnectAPICopyWithImpl<$Res,
     Object? p8 = freezed,
     Object? keyId = freezed,
     Object? issuerId = freezed,
+    Object? appId = freezed,
   }) {
     return _then(_value.copyWith(
       p8: freezed == p8
@@ -1044,6 +1074,10 @@ class _$WorkflowAppStoreConnectAPICopyWithImpl<$Res,
           ? _value.issuerId
           : issuerId // ignore: cast_nullable_to_non_nullable
               as String?,
+      appId: freezed == appId
+          ? _value.appId
+          : appId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -1057,7 +1091,7 @@ abstract class _$$WorkflowAppStoreConnectAPIImplCopyWith<$Res>
       __$$WorkflowAppStoreConnectAPIImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? p8, String? keyId, String? issuerId});
+  $Res call({String? p8, String? keyId, String? issuerId, String? appId});
 }
 
 /// @nodoc
@@ -1076,6 +1110,7 @@ class __$$WorkflowAppStoreConnectAPIImplCopyWithImpl<$Res>
     Object? p8 = freezed,
     Object? keyId = freezed,
     Object? issuerId = freezed,
+    Object? appId = freezed,
   }) {
     return _then(_$WorkflowAppStoreConnectAPIImpl(
       p8: freezed == p8
@@ -1090,6 +1125,10 @@ class __$$WorkflowAppStoreConnectAPIImplCopyWithImpl<$Res>
           ? _value.issuerId
           : issuerId // ignore: cast_nullable_to_non_nullable
               as String?,
+      appId: freezed == appId
+          ? _value.appId
+          : appId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -1098,7 +1137,10 @@ class __$$WorkflowAppStoreConnectAPIImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$WorkflowAppStoreConnectAPIImpl implements _WorkflowAppStoreConnectAPI {
   const _$WorkflowAppStoreConnectAPIImpl(
-      {this.p8 = null, this.keyId = null, this.issuerId = null});
+      {this.p8 = null,
+      this.keyId = null,
+      this.issuerId = null,
+      this.appId = null});
 
   factory _$WorkflowAppStoreConnectAPIImpl.fromJson(
           Map<String, dynamic> json) =>
@@ -1113,10 +1155,13 @@ class _$WorkflowAppStoreConnectAPIImpl implements _WorkflowAppStoreConnectAPI {
   @override
   @JsonKey()
   final String? issuerId;
+  @override
+  @JsonKey()
+  final String? appId;
 
   @override
   String toString() {
-    return 'WorkflowAppStoreConnectAPI(p8: $p8, keyId: $keyId, issuerId: $issuerId)';
+    return 'WorkflowAppStoreConnectAPI(p8: $p8, keyId: $keyId, issuerId: $issuerId, appId: $appId)';
   }
 
   @override
@@ -1127,12 +1172,13 @@ class _$WorkflowAppStoreConnectAPIImpl implements _WorkflowAppStoreConnectAPI {
             (identical(other.p8, p8) || other.p8 == p8) &&
             (identical(other.keyId, keyId) || other.keyId == keyId) &&
             (identical(other.issuerId, issuerId) ||
-                other.issuerId == issuerId));
+                other.issuerId == issuerId) &&
+            (identical(other.appId, appId) || other.appId == appId));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, p8, keyId, issuerId);
+  int get hashCode => Object.hash(runtimeType, p8, keyId, issuerId, appId);
 
   @JsonKey(ignore: true)
   @override
@@ -1154,7 +1200,8 @@ abstract class _WorkflowAppStoreConnectAPI
   const factory _WorkflowAppStoreConnectAPI(
       {final String? p8,
       final String? keyId,
-      final String? issuerId}) = _$WorkflowAppStoreConnectAPIImpl;
+      final String? issuerId,
+      final String? appId}) = _$WorkflowAppStoreConnectAPIImpl;
 
   factory _WorkflowAppStoreConnectAPI.fromJson(Map<String, dynamic> json) =
       _$WorkflowAppStoreConnectAPIImpl.fromJson;
@@ -1165,6 +1212,8 @@ abstract class _WorkflowAppStoreConnectAPI
   String? get keyId;
   @override
   String? get issuerId;
+  @override
+  String? get appId;
   @override
   @JsonKey(ignore: true)
   _$$WorkflowAppStoreConnectAPIImplCopyWith<_$WorkflowAppStoreConnectAPIImpl>
