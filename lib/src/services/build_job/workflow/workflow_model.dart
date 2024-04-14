@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:openci_runner/src/features/job/domain/job_data.dart';
 import 'package:openci_runner/src/features/user/domain/user_data.dart';
 
 part 'workflow_model.freezed.dart';
@@ -7,16 +8,29 @@ part 'workflow_model.g.dart';
 @freezed
 class WorkflowModel with _$WorkflowModel {
   const factory WorkflowModel({
+    required WorkflowAndroidConfig android,
     required WorkflowFirebaseConfig firebase,
     required WorkflowIosConfig ios,
     required String organizationId,
     required WorkflowFlutterConfig flutter,
     required WorkflowShorebirdConfig shorebird,
     required String workflowName,
+    required TargetPlatform platform,
     @Default(null) BuildDistributionChannel? distribution,
   }) = _WorkflowModel;
   factory WorkflowModel.fromJson(Map<String, Object?> json) =>
       _$WorkflowModelFromJson(json);
+}
+
+@freezed
+class WorkflowAndroidConfig with _$WorkflowAndroidConfig {
+  const factory WorkflowAndroidConfig({
+    @Default(null) String? jks,
+    @Default(null) String? jksName,
+    @Default(null) String? keyProperties,
+  }) = _WorkflowAndroidConfig;
+  factory WorkflowAndroidConfig.fromJson(Map<String, Object?> json) =>
+      _$WorkflowAndroidConfigFromJson(json);
 }
 
 @freezed
@@ -36,6 +50,7 @@ class WorkflowFirebaseConfig with _$WorkflowFirebaseConfig {
   const factory WorkflowFirebaseConfig({
     required AppDistributionConfig appDistribution,
     @Default(null) String? appIdIos,
+    @Default(null) String? appIdAndroid,
     @Default(null) String? serviceAccountJson,
   }) = _WorkflowFirebaseConfig;
   factory WorkflowFirebaseConfig.fromJson(Map<String, Object?> json) =>

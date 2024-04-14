@@ -8,6 +8,8 @@ part of 'workflow_model.dart';
 
 _$WorkflowModelImpl _$$WorkflowModelImplFromJson(Map<String, dynamic> json) =>
     _$WorkflowModelImpl(
+      android: WorkflowAndroidConfig.fromJson(
+          json['android'] as Map<String, dynamic>),
       firebase: WorkflowFirebaseConfig.fromJson(
           json['firebase'] as Map<String, dynamic>),
       ios: WorkflowIosConfig.fromJson(json['ios'] as Map<String, dynamic>),
@@ -17,6 +19,7 @@ _$WorkflowModelImpl _$$WorkflowModelImplFromJson(Map<String, dynamic> json) =>
       shorebird: WorkflowShorebirdConfig.fromJson(
           json['shorebird'] as Map<String, dynamic>),
       workflowName: json['workflowName'] as String,
+      platform: $enumDecode(_$TargetPlatformEnumMap, json['platform']),
       distribution: $enumDecodeNullable(
               _$BuildDistributionChannelEnumMap, json['distribution']) ??
           null,
@@ -24,14 +27,21 @@ _$WorkflowModelImpl _$$WorkflowModelImplFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$WorkflowModelImplToJson(_$WorkflowModelImpl instance) =>
     <String, dynamic>{
+      'android': instance.android,
       'firebase': instance.firebase,
       'ios': instance.ios,
       'organizationId': instance.organizationId,
       'flutter': instance.flutter,
       'shorebird': instance.shorebird,
       'workflowName': instance.workflowName,
+      'platform': _$TargetPlatformEnumMap[instance.platform]!,
       'distribution': _$BuildDistributionChannelEnumMap[instance.distribution],
     };
+
+const _$TargetPlatformEnumMap = {
+  TargetPlatform.android: 'android',
+  TargetPlatform.ios: 'ios',
+};
 
 const _$BuildDistributionChannelEnumMap = {
   BuildDistributionChannel.firebaseAppDistribution: 'firebaseAppDistribution',
@@ -39,6 +49,22 @@ const _$BuildDistributionChannelEnumMap = {
   BuildDistributionChannel.playStoreInternal: 'playStoreInternal',
   BuildDistributionChannel.playStoreBeta: 'playStoreBeta',
 };
+
+_$WorkflowAndroidConfigImpl _$$WorkflowAndroidConfigImplFromJson(
+        Map<String, dynamic> json) =>
+    _$WorkflowAndroidConfigImpl(
+      jks: json['jks'] as String? ?? null,
+      jksName: json['jksName'] as String? ?? null,
+      keyProperties: json['keyProperties'] as String? ?? null,
+    );
+
+Map<String, dynamic> _$$WorkflowAndroidConfigImplToJson(
+        _$WorkflowAndroidConfigImpl instance) =>
+    <String, dynamic>{
+      'jks': instance.jks,
+      'jksName': instance.jksName,
+      'keyProperties': instance.keyProperties,
+    };
 
 _$WorkflowShorebirdConfigImpl _$$WorkflowShorebirdConfigImplFromJson(
         Map<String, dynamic> json) =>
@@ -64,6 +90,7 @@ _$WorkflowFirebaseConfigImpl _$$WorkflowFirebaseConfigImplFromJson(
       appDistribution: AppDistributionConfig.fromJson(
           json['appDistribution'] as Map<String, dynamic>),
       appIdIos: json['appIdIos'] as String? ?? null,
+      appIdAndroid: json['appIdAndroid'] as String? ?? null,
       serviceAccountJson: json['serviceAccountJson'] as String? ?? null,
     );
 
@@ -72,6 +99,7 @@ Map<String, dynamic> _$$WorkflowFirebaseConfigImplToJson(
     <String, dynamic>{
       'appDistribution': instance.appDistribution,
       'appIdIos': instance.appIdIos,
+      'appIdAndroid': instance.appIdAndroid,
       'serviceAccountJson': instance.serviceAccountJson,
     };
 

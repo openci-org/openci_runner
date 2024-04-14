@@ -10,6 +10,8 @@ import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_runner/src/features/job/domain/job_data.dart';
 import 'package:openci_runner/src/features/job/domain/job_data_v2.dart';
 import 'package:openci_runner/src/features/vm/controller/vm_controller.dart';
+import 'package:openci_runner/src/services/build_job/aap_build_service.dart';
+import 'package:openci_runner/src/services/build_job/build_distribution_service.dart';
 import 'package:openci_runner/src/services/build_job/build_utility_service.dart';
 import 'package:openci_runner/src/services/build_job/flutter_version_manager.dart';
 import 'package:openci_runner/src/services/build_job/ipa_build_service.dart';
@@ -262,73 +264,92 @@ class RunnerCommand extends Command<int> {
         }
         final organization = OrganizationModel.fromJson(organizationData);
 
+        await buildUtilityService.cloneRepository(
+          sshShellService,
+          sshClient,
+          buildJob,
+          jobId,
+          vm.workingVMName,
+          tokenId,
+        );
+
+        final flutterVersionManager = FlutterVersionManager(
+          sshShellService,
+          sshClient,
+          jobId,
+          vm.workingVMName,
+          appName,
+        );
+
+        await flutterVersionManager
+            .changeFlutterVersion(workflow.flutter.version);
+
+        final buildDistributionService = BuildDistributionService(
+          sshShellService,
+          sshClient,
+          jobId,
+          vm.workingVMName,
+          appName,
+        );
+
         if (targetPlatform == TargetPlatform.android) {
-          // final androidJobController = AndroidJobController(
-          //   sshService: ssh,
-          //   sshClient: sshClient,
-          //   gitHubService: GitHubService(),
-          //   firestore: firestore,
-          //   vmController: vm,
-          // );
+          final aabBuildService = AabBuildService(
+            sshShellService,
+            sshClient,
+            jobId,
+            vm.workingVMName,
+            appName,
+          );
 
-          // if (await androidJobController.cloneRepository == false) {
-          //   _logger.err('clone repository failed');
-          //   continue;
-          // }
+          await aabBuildService.downloadKeyJks(workflow.android.jks);
+          await aabBuildService
+              .downloadKeyProperties(workflow.android.keyProperties);
+          final useShorebird = workflow.shorebird.useShorebird;
 
-          // if (await androidJobController.importServiceAccountJson == false) {
-          //   _logger.err('import service account json failed');
-          //   continue;
-          // }
+          if (useShorebird != null && useShorebird == true) {
+            await aabBuildService.buildShorebirdAppBundle(
+              organization.buildNumber.android,
+              workflow.shorebird.token,
+              workflow.flutter.version,
+              workflow.flutter.dartDefine,
+            );
+          } else {
+            await aabBuildService
+                .buildAppBundle(organization.buildNumber.android);
+          }
 
-          // if (await androidJobController.importKeyJks == false) {
-          //   _logger.err('import key jks failed');
-          //   continue;
-          // }
+          final distribution = workflow.distribution;
 
-          // if (await androidJobController.importKeyProperties == false) {
-          //   _logger.err('import key properties failed');
-          //   continue;
-          // }
-
-          // if (await androidJobController.changeFlutterVersion == false) {
-          //   _logger.err('changeFlutterVersion failed');
-          //   continue;
-          // }
-
-          // if (await androidJobController.checkFlutterVersion == false) {
-          //   _logger.err('checkFlutterVersion failed');
-          //   continue;
-          // }
-
-          // if (await androidJobController.flutterClean == false) {
-          //   _logger.err('flutter clean failed');
-          //   continue;
-          // }
-
-          // if (await androidJobController.buildApk == false) {
-          //   _logger.err('build apk failed');
-          //   continue;
-          // }
-
-          // if (await androidJobController.uploadApkToFAD == false) {
-          //   _logger.err('upload apk failed');
-          //   continue;
-          // }
-
-          // await firestore
-          //     .collection('users')
-          //     .doc(user.userId)
-          //     .update({'androidBuildNumber': user.androidBuildNumber + 1});
-
-          // await firestore
-          //     .collection(jobsPath)
-          //     .doc(job.documentId)
-          //     .update({'success': true});
-
-          // _logger.success('build success');
-
-          // await vm.stopVM;
+          switch (distribution) {
+            case BuildDistributionChannel.firebaseAppDistribution:
+              final serviceAccountJsonDownloadUrl =
+                  workflow.firebase.serviceAccountJson;
+              if (serviceAccountJsonDownloadUrl == null) {
+                throw Exception('Service account json download url is null');
+              }
+              await buildUtilityService.importServiceAccountJson(
+                appConfig.firebaseServiceAccountJson,
+                sshShellService,
+                sshClient,
+                jobId,
+                vm.workingVMName,
+                appName,
+                serviceAccountJsonDownloadUrl,
+              );
+              await buildDistributionService
+                  .uploadBuildToFirebaseAppDistribution(
+                workflow.firebase.appIdAndroid,
+                workflow.firebase.appDistribution.testerGroups,
+                TargetPlatform.android,
+              );
+              _logger.success('upload build success');
+            case BuildDistributionChannel.testFlight:
+            case BuildDistributionChannel.playStoreInternal:
+            //
+            case BuildDistributionChannel.playStoreBeta:
+            case null:
+            // TODO: Handle this case.
+          }
         } else if (targetPlatform == TargetPlatform.ios) {
           final ipaBuildService = IpaBuildService(
             sshShellService,
@@ -336,14 +357,6 @@ class RunnerCommand extends Command<int> {
             jobId,
             vm.workingVMName,
             appName,
-          );
-          await buildUtilityService.cloneRepository(
-            sshShellService,
-            sshClient,
-            buildJob,
-            jobId,
-            vm.workingVMName,
-            tokenId,
           );
 
           await ipaBuildService.downloadExportOptionsPlist(
@@ -373,17 +386,6 @@ class RunnerCommand extends Command<int> {
             workflow.ios.teamId,
             workflow.ios.provisioningProfile?.name,
           );
-
-          final flutterVersionManager = FlutterVersionManager(
-            sshShellService,
-            sshClient,
-            jobId,
-            vm.workingVMName,
-            appName,
-          );
-
-          await flutterVersionManager
-              .changeFlutterVersion(workflow.flutter.version);
 
           await ipaBuildService.runCustomScripts();
 
@@ -425,8 +427,6 @@ class RunnerCommand extends Command<int> {
 
             _logger.success('ipa build success');
 
-            // 以下はBuildDistributionServiceにした方がいいかも。
-            // Prepare for distribution
             final distribution = workflow.distribution;
 
             switch (distribution) {
@@ -445,9 +445,11 @@ class RunnerCommand extends Command<int> {
                   appName,
                   serviceAccountJsonDownloadUrl,
                 );
-                await ipaBuildService.uploadIpaToFirebaseAppDistribution(
+                await buildDistributionService
+                    .uploadBuildToFirebaseAppDistribution(
                   workflow.firebase.appIdIos,
                   workflow.firebase.appDistribution.testerGroups,
+                  TargetPlatform.ios,
                 );
                 _logger.success('upload build success');
               case BuildDistributionChannel.testFlight:
@@ -458,6 +460,7 @@ class RunnerCommand extends Command<int> {
                 await ipaBuildService.uploadIpaToTestFlight(
                   workflow.ios.appStoreConnectAPI?.keyId,
                   workflow.ios.appStoreConnectAPI?.issuerId,
+                  await buildDistributionService.ipaPath(),
                 );
               case BuildDistributionChannel.playStoreInternal:
               //
@@ -465,20 +468,19 @@ class RunnerCommand extends Command<int> {
               case null:
               // TODO: Handle this case.
             }
-
-            await buildUtilityService.incrementBuildNumber(
-              organization.documentId,
-              organization.buildNumber,
-              TargetPlatform.ios,
-            );
-            _logger.success('ios buildNumber update success');
           }
-
-          await buildUtilityService.markJobAsSuccess(jobId);
-          _logger.success('whole build process completed');
-
-          await vm.stopVM;
         }
+        await buildUtilityService.incrementBuildNumber(
+          organization.documentId,
+          organization.buildNumber,
+          workflow.platform,
+        );
+        _logger.success('${workflow.platform} buildNumber update success');
+
+        await buildUtilityService.markJobAsSuccess(jobId);
+        _logger.success('whole build process completed');
+
+        await vm.stopVM;
       } catch (e, s) {
         _logger
           ..err('CLI crashed: $e')

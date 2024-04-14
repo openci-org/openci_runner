@@ -4,6 +4,7 @@ import 'package:dart_firebase_admin/firestore.dart';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:openci_runner/src/features/job/domain/job_data.dart';
 import 'package:openci_runner/src/features/job/domain/job_data_v2.dart';
+import 'package:openci_runner/src/services/build_job/build_common_commands.dart';
 import 'package:openci_runner/src/services/build_job/organization/organization_model.dart';
 import 'package:openci_runner/src/services/firebase/firestore/firestore_path.dart';
 import 'package:openci_runner/src/services/shell/ssh_shell_service.dart';
@@ -53,7 +54,7 @@ class BuildUtilityService {
     String downloadUrl,
   ) async {
     await sshShellService.executeCommand(
-      'cd ~/Downloads/$appName/ && curl -L -o "service_account.json" "$downloadUrl"',
+      '${BuildCommonCommands.navigateToAppDirectory(appName)} && curl -L -o "service_account.json" "$downloadUrl"',
       sshClient,
       jobId,
       workingVMName,
@@ -106,4 +107,6 @@ class BuildUtilityService {
       'buildStatus.success': true,
     });
   }
+
+  String get loadZshrc => 'source ~/.zshrc';
 }

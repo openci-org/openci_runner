@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dartssh2/dartssh2.dart';
 import 'package:openci_runner/src/features/user/domain/user_data.dart';
+import 'package:openci_runner/src/services/build_job/build_common_commands.dart';
 import 'package:openci_runner/src/services/macos/directory_paths.dart';
 import 'package:openci_runner/src/services/shell/shell_result.dart';
 import 'package:openci_runner/src/services/shell/ssh_shell_service.dart';
@@ -31,7 +32,7 @@ class IpaBuildService {
     const fileName = 'openCIexportOptions.plist';
 
     await _sshShellService.executeCommand(
-      'cd ~/Downloads/$_appName/ios/ && curl -L -o $fileName "$downloadUrl"',
+      '${BuildCommonCommands.navigateToAppDirectory(_appName)}/ios/ && curl -L -o $fileName "$downloadUrl"',
       _sshClient,
       _jobId,
       _workingVMName,
@@ -101,7 +102,7 @@ cp $mobileprovisionPath ~/Library/MobileDevice/Provisioning\\ Profiles;
   Future<void> runCustomScripts() async {
     await _sshShellService.executeCommand(
       '''
-source ~/.zshrc;
+${BuildCommonCommands.loadZshrc};
 cd Downloads/$_appName;
 flutter pub get;
 cd ios;
@@ -116,13 +117,6 @@ pod install;
     );
   }
 
-  String _generateDartDefines(List<String>? dartDefines) {
-    if (dartDefines == null) {
-      return '';
-    }
-    return dartDefines.map((e) => '--dart-define=$e').join(' ');
-  }
-
   Future<void> buildIpa(
     int iosBuildNumber,
     Flavor flavor,
@@ -132,7 +126,7 @@ pod install;
     switch (flavor) {
       case Flavor.none:
         command =
-            'source ~/.zshrc && cd ~/Downloads/$_appName && flutter build ipa ${_generateDartDefines(dartDefines)} --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist;';
+            '${BuildCommonCommands.loadZshrc} && ${BuildCommonCommands.navigateToAppDirectory(_appName)} && flutter build ipa ${BuildCommonCommands.generateDartDefines(dartDefines)} --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist;';
       default:
         throw Exception('Flavor must be specified');
     }
@@ -157,10 +151,10 @@ pod install;
     switch (flavor) {
       case Flavor.none:
         command = '''
-source ~/.zshrc;
-cd ~/Downloads/$_appName;
+${BuildCommonCommands.loadZshrc};
+${BuildCommonCommands.navigateToAppDirectory(_appName)};
 export SHOREBIRD_TOKEN=$shorebirdToken;
-shorebird patch ios --allow-asset-diffs --allow-native-diffs -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist ${_generateDartDefines(dartDefines)}; 
+shorebird patch ios --allow-asset-diffs --allow-native-diffs -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist ${BuildCommonCommands.generateDartDefines(dartDefines)}; 
 ''';
       default:
         throw Exception('Flavor must be specified');
@@ -191,51 +185,16 @@ shorebird patch ios --allow-asset-diffs --allow-native-diffs -- --build-number=$
     switch (flavor) {
       case Flavor.none:
         command = '''
-source ~/.zshrc;
-cd ~/Downloads/$_appName;
+${BuildCommonCommands.loadZshrc};
+${BuildCommonCommands.navigateToAppDirectory(_appName)};
 export SHOREBIRD_TOKEN=$shorebirdToken;
-shorebird release ios $flutterVersionArgument -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist ${_generateDartDefines(dartDefines)}; 
+shorebird release ios $flutterVersionArgument -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist ${BuildCommonCommands.generateDartDefines(dartDefines)}; 
 ''';
       default:
         throw Exception('Flavor must be specified');
     }
     return _sshShellService.executeCommand(
       command,
-      _sshClient,
-      _jobId,
-      _workingVMName,
-    );
-  }
-
-  Future<String> ipaPath() async {
-    final result = await _sshShellService.executeCommand(
-      'find "/Users/admin/Downloads/$_appName/build/ios/ipa" -type f -name "*.ipa"',
-      _sshClient,
-      _jobId,
-      _workingVMName,
-    );
-    final filePath = result.sessionResult.sessionStdout;
-    return filePath.replaceAll('\n', '');
-  }
-
-  Future<void> uploadIpaToFirebaseAppDistribution(
-    String? firebaseAppIdIos,
-    List<String>? iosTesterGroups,
-  ) async {
-    if (firebaseAppIdIos == null) {
-      throw Exception('Firebase App ID is required');
-    }
-    if (iosTesterGroups == null) {
-      throw Exception('iOS tester groups are required');
-    }
-    final path = await ipaPath();
-
-    await _sshShellService.executeCommand(
-      """
-source ~/.zshrc && cd ~/Downloads/$_appName;
-export GOOGLE_APPLICATION_CREDENTIALS="/Users/admin/Downloads/$_appName/service_account.json";
-firebase appdistribution:distribute "$path" --app "$firebaseAppIdIos" --groups "${iosTesterGroups.join(', ')}"; 
-""",
       _sshClient,
       _jobId,
       _workingVMName,
@@ -286,6 +245,7 @@ curl -sL "$downloadUrl"
   Future<void> uploadIpaToTestFlight(
     String? appStoreConnectKeyId,
     String? appStoreConnectIssuerId,
+    String ipaPath,
   ) async {
     if (appStoreConnectKeyId == null) {
       throw Exception('Download URL is required');
@@ -293,10 +253,9 @@ curl -sL "$downloadUrl"
     if (appStoreConnectIssuerId == null) {
       throw Exception('Key ID is required');
     }
-    final path = await ipaPath();
     await _sshShellService.executeCommand(
       '''
-xcrun altool --upload-app -f $path --type ios --apiKey $appStoreConnectKeyId --apiIssuer $appStoreConnectIssuerId
+xcrun altool --upload-app -f $ipaPath --type ios --apiKey $appStoreConnectKeyId --apiIssuer $appStoreConnectIssuerId
 ''',
       _sshClient,
       _jobId,
@@ -372,7 +331,6 @@ xcrun altool --upload-app -f $path --type ios --apiKey $appStoreConnectKeyId --a
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
-      print('data: $data');
       return data;
     } else {
       throw Exception(

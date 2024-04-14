@@ -20,12 +20,14 @@ WorkflowModel _$WorkflowModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$WorkflowModel {
+  WorkflowAndroidConfig get android => throw _privateConstructorUsedError;
   WorkflowFirebaseConfig get firebase => throw _privateConstructorUsedError;
   WorkflowIosConfig get ios => throw _privateConstructorUsedError;
   String get organizationId => throw _privateConstructorUsedError;
   WorkflowFlutterConfig get flutter => throw _privateConstructorUsedError;
   WorkflowShorebirdConfig get shorebird => throw _privateConstructorUsedError;
   String get workflowName => throw _privateConstructorUsedError;
+  TargetPlatform get platform => throw _privateConstructorUsedError;
   BuildDistributionChannel? get distribution =>
       throw _privateConstructorUsedError;
 
@@ -42,14 +44,17 @@ abstract class $WorkflowModelCopyWith<$Res> {
       _$WorkflowModelCopyWithImpl<$Res, WorkflowModel>;
   @useResult
   $Res call(
-      {WorkflowFirebaseConfig firebase,
+      {WorkflowAndroidConfig android,
+      WorkflowFirebaseConfig firebase,
       WorkflowIosConfig ios,
       String organizationId,
       WorkflowFlutterConfig flutter,
       WorkflowShorebirdConfig shorebird,
       String workflowName,
+      TargetPlatform platform,
       BuildDistributionChannel? distribution});
 
+  $WorkflowAndroidConfigCopyWith<$Res> get android;
   $WorkflowFirebaseConfigCopyWith<$Res> get firebase;
   $WorkflowIosConfigCopyWith<$Res> get ios;
   $WorkflowFlutterConfigCopyWith<$Res> get flutter;
@@ -69,15 +74,21 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? android = null,
     Object? firebase = null,
     Object? ios = null,
     Object? organizationId = null,
     Object? flutter = null,
     Object? shorebird = null,
     Object? workflowName = null,
+    Object? platform = null,
     Object? distribution = freezed,
   }) {
     return _then(_value.copyWith(
+      android: null == android
+          ? _value.android
+          : android // ignore: cast_nullable_to_non_nullable
+              as WorkflowAndroidConfig,
       firebase: null == firebase
           ? _value.firebase
           : firebase // ignore: cast_nullable_to_non_nullable
@@ -102,11 +113,23 @@ class _$WorkflowModelCopyWithImpl<$Res, $Val extends WorkflowModel>
           ? _value.workflowName
           : workflowName // ignore: cast_nullable_to_non_nullable
               as String,
+      platform: null == platform
+          ? _value.platform
+          : platform // ignore: cast_nullable_to_non_nullable
+              as TargetPlatform,
       distribution: freezed == distribution
           ? _value.distribution
           : distribution // ignore: cast_nullable_to_non_nullable
               as BuildDistributionChannel?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $WorkflowAndroidConfigCopyWith<$Res> get android {
+    return $WorkflowAndroidConfigCopyWith<$Res>(_value.android, (value) {
+      return _then(_value.copyWith(android: value) as $Val);
+    });
   }
 
   @override
@@ -151,14 +174,18 @@ abstract class _$$WorkflowModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {WorkflowFirebaseConfig firebase,
+      {WorkflowAndroidConfig android,
+      WorkflowFirebaseConfig firebase,
       WorkflowIosConfig ios,
       String organizationId,
       WorkflowFlutterConfig flutter,
       WorkflowShorebirdConfig shorebird,
       String workflowName,
+      TargetPlatform platform,
       BuildDistributionChannel? distribution});
 
+  @override
+  $WorkflowAndroidConfigCopyWith<$Res> get android;
   @override
   $WorkflowFirebaseConfigCopyWith<$Res> get firebase;
   @override
@@ -180,15 +207,21 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? android = null,
     Object? firebase = null,
     Object? ios = null,
     Object? organizationId = null,
     Object? flutter = null,
     Object? shorebird = null,
     Object? workflowName = null,
+    Object? platform = null,
     Object? distribution = freezed,
   }) {
     return _then(_$WorkflowModelImpl(
+      android: null == android
+          ? _value.android
+          : android // ignore: cast_nullable_to_non_nullable
+              as WorkflowAndroidConfig,
       firebase: null == firebase
           ? _value.firebase
           : firebase // ignore: cast_nullable_to_non_nullable
@@ -213,6 +246,10 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
           ? _value.workflowName
           : workflowName // ignore: cast_nullable_to_non_nullable
               as String,
+      platform: null == platform
+          ? _value.platform
+          : platform // ignore: cast_nullable_to_non_nullable
+              as TargetPlatform,
       distribution: freezed == distribution
           ? _value.distribution
           : distribution // ignore: cast_nullable_to_non_nullable
@@ -225,17 +262,21 @@ class __$$WorkflowModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$WorkflowModelImpl implements _WorkflowModel {
   const _$WorkflowModelImpl(
-      {required this.firebase,
+      {required this.android,
+      required this.firebase,
       required this.ios,
       required this.organizationId,
       required this.flutter,
       required this.shorebird,
       required this.workflowName,
+      required this.platform,
       this.distribution = null});
 
   factory _$WorkflowModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$WorkflowModelImplFromJson(json);
 
+  @override
+  final WorkflowAndroidConfig android;
   @override
   final WorkflowFirebaseConfig firebase;
   @override
@@ -249,12 +290,14 @@ class _$WorkflowModelImpl implements _WorkflowModel {
   @override
   final String workflowName;
   @override
+  final TargetPlatform platform;
+  @override
   @JsonKey()
   final BuildDistributionChannel? distribution;
 
   @override
   String toString() {
-    return 'WorkflowModel(firebase: $firebase, ios: $ios, organizationId: $organizationId, flutter: $flutter, shorebird: $shorebird, workflowName: $workflowName, distribution: $distribution)';
+    return 'WorkflowModel(android: $android, firebase: $firebase, ios: $ios, organizationId: $organizationId, flutter: $flutter, shorebird: $shorebird, workflowName: $workflowName, platform: $platform, distribution: $distribution)';
   }
 
   @override
@@ -262,6 +305,7 @@ class _$WorkflowModelImpl implements _WorkflowModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$WorkflowModelImpl &&
+            (identical(other.android, android) || other.android == android) &&
             (identical(other.firebase, firebase) ||
                 other.firebase == firebase) &&
             (identical(other.ios, ios) || other.ios == ios) &&
@@ -272,14 +316,16 @@ class _$WorkflowModelImpl implements _WorkflowModel {
                 other.shorebird == shorebird) &&
             (identical(other.workflowName, workflowName) ||
                 other.workflowName == workflowName) &&
+            (identical(other.platform, platform) ||
+                other.platform == platform) &&
             (identical(other.distribution, distribution) ||
                 other.distribution == distribution));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, firebase, ios, organizationId,
-      flutter, shorebird, workflowName, distribution);
+  int get hashCode => Object.hash(runtimeType, android, firebase, ios,
+      organizationId, flutter, shorebird, workflowName, platform, distribution);
 
   @JsonKey(ignore: true)
   @override
@@ -297,17 +343,21 @@ class _$WorkflowModelImpl implements _WorkflowModel {
 
 abstract class _WorkflowModel implements WorkflowModel {
   const factory _WorkflowModel(
-      {required final WorkflowFirebaseConfig firebase,
+      {required final WorkflowAndroidConfig android,
+      required final WorkflowFirebaseConfig firebase,
       required final WorkflowIosConfig ios,
       required final String organizationId,
       required final WorkflowFlutterConfig flutter,
       required final WorkflowShorebirdConfig shorebird,
       required final String workflowName,
+      required final TargetPlatform platform,
       final BuildDistributionChannel? distribution}) = _$WorkflowModelImpl;
 
   factory _WorkflowModel.fromJson(Map<String, dynamic> json) =
       _$WorkflowModelImpl.fromJson;
 
+  @override
+  WorkflowAndroidConfig get android;
   @override
   WorkflowFirebaseConfig get firebase;
   @override
@@ -321,11 +371,194 @@ abstract class _WorkflowModel implements WorkflowModel {
   @override
   String get workflowName;
   @override
+  TargetPlatform get platform;
+  @override
   BuildDistributionChannel? get distribution;
   @override
   @JsonKey(ignore: true)
   _$$WorkflowModelImplCopyWith<_$WorkflowModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+WorkflowAndroidConfig _$WorkflowAndroidConfigFromJson(
+    Map<String, dynamic> json) {
+  return _WorkflowAndroidConfig.fromJson(json);
+}
+
+/// @nodoc
+mixin _$WorkflowAndroidConfig {
+  String? get jks => throw _privateConstructorUsedError;
+  String? get jksName => throw _privateConstructorUsedError;
+  String? get keyProperties => throw _privateConstructorUsedError;
+
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $WorkflowAndroidConfigCopyWith<WorkflowAndroidConfig> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $WorkflowAndroidConfigCopyWith<$Res> {
+  factory $WorkflowAndroidConfigCopyWith(WorkflowAndroidConfig value,
+          $Res Function(WorkflowAndroidConfig) then) =
+      _$WorkflowAndroidConfigCopyWithImpl<$Res, WorkflowAndroidConfig>;
+  @useResult
+  $Res call({String? jks, String? jksName, String? keyProperties});
+}
+
+/// @nodoc
+class _$WorkflowAndroidConfigCopyWithImpl<$Res,
+        $Val extends WorkflowAndroidConfig>
+    implements $WorkflowAndroidConfigCopyWith<$Res> {
+  _$WorkflowAndroidConfigCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? jks = freezed,
+    Object? jksName = freezed,
+    Object? keyProperties = freezed,
+  }) {
+    return _then(_value.copyWith(
+      jks: freezed == jks
+          ? _value.jks
+          : jks // ignore: cast_nullable_to_non_nullable
+              as String?,
+      jksName: freezed == jksName
+          ? _value.jksName
+          : jksName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      keyProperties: freezed == keyProperties
+          ? _value.keyProperties
+          : keyProperties // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$WorkflowAndroidConfigImplCopyWith<$Res>
+    implements $WorkflowAndroidConfigCopyWith<$Res> {
+  factory _$$WorkflowAndroidConfigImplCopyWith(
+          _$WorkflowAndroidConfigImpl value,
+          $Res Function(_$WorkflowAndroidConfigImpl) then) =
+      __$$WorkflowAndroidConfigImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String? jks, String? jksName, String? keyProperties});
+}
+
+/// @nodoc
+class __$$WorkflowAndroidConfigImplCopyWithImpl<$Res>
+    extends _$WorkflowAndroidConfigCopyWithImpl<$Res,
+        _$WorkflowAndroidConfigImpl>
+    implements _$$WorkflowAndroidConfigImplCopyWith<$Res> {
+  __$$WorkflowAndroidConfigImplCopyWithImpl(_$WorkflowAndroidConfigImpl _value,
+      $Res Function(_$WorkflowAndroidConfigImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? jks = freezed,
+    Object? jksName = freezed,
+    Object? keyProperties = freezed,
+  }) {
+    return _then(_$WorkflowAndroidConfigImpl(
+      jks: freezed == jks
+          ? _value.jks
+          : jks // ignore: cast_nullable_to_non_nullable
+              as String?,
+      jksName: freezed == jksName
+          ? _value.jksName
+          : jksName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      keyProperties: freezed == keyProperties
+          ? _value.keyProperties
+          : keyProperties // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$WorkflowAndroidConfigImpl implements _WorkflowAndroidConfig {
+  const _$WorkflowAndroidConfigImpl(
+      {this.jks = null, this.jksName = null, this.keyProperties = null});
+
+  factory _$WorkflowAndroidConfigImpl.fromJson(Map<String, dynamic> json) =>
+      _$$WorkflowAndroidConfigImplFromJson(json);
+
+  @override
+  @JsonKey()
+  final String? jks;
+  @override
+  @JsonKey()
+  final String? jksName;
+  @override
+  @JsonKey()
+  final String? keyProperties;
+
+  @override
+  String toString() {
+    return 'WorkflowAndroidConfig(jks: $jks, jksName: $jksName, keyProperties: $keyProperties)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$WorkflowAndroidConfigImpl &&
+            (identical(other.jks, jks) || other.jks == jks) &&
+            (identical(other.jksName, jksName) || other.jksName == jksName) &&
+            (identical(other.keyProperties, keyProperties) ||
+                other.keyProperties == keyProperties));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(runtimeType, jks, jksName, keyProperties);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$WorkflowAndroidConfigImplCopyWith<_$WorkflowAndroidConfigImpl>
+      get copyWith => __$$WorkflowAndroidConfigImplCopyWithImpl<
+          _$WorkflowAndroidConfigImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$WorkflowAndroidConfigImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _WorkflowAndroidConfig implements WorkflowAndroidConfig {
+  const factory _WorkflowAndroidConfig(
+      {final String? jks,
+      final String? jksName,
+      final String? keyProperties}) = _$WorkflowAndroidConfigImpl;
+
+  factory _WorkflowAndroidConfig.fromJson(Map<String, dynamic> json) =
+      _$WorkflowAndroidConfigImpl.fromJson;
+
+  @override
+  String? get jks;
+  @override
+  String? get jksName;
+  @override
+  String? get keyProperties;
+  @override
+  @JsonKey(ignore: true)
+  _$$WorkflowAndroidConfigImplCopyWith<_$WorkflowAndroidConfigImpl>
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 WorkflowShorebirdConfig _$WorkflowShorebirdConfigFromJson(
@@ -551,6 +784,7 @@ mixin _$WorkflowFirebaseConfig {
   AppDistributionConfig get appDistribution =>
       throw _privateConstructorUsedError;
   String? get appIdIos => throw _privateConstructorUsedError;
+  String? get appIdAndroid => throw _privateConstructorUsedError;
   String? get serviceAccountJson => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -568,6 +802,7 @@ abstract class $WorkflowFirebaseConfigCopyWith<$Res> {
   $Res call(
       {AppDistributionConfig appDistribution,
       String? appIdIos,
+      String? appIdAndroid,
       String? serviceAccountJson});
 
   $AppDistributionConfigCopyWith<$Res> get appDistribution;
@@ -589,6 +824,7 @@ class _$WorkflowFirebaseConfigCopyWithImpl<$Res,
   $Res call({
     Object? appDistribution = null,
     Object? appIdIos = freezed,
+    Object? appIdAndroid = freezed,
     Object? serviceAccountJson = freezed,
   }) {
     return _then(_value.copyWith(
@@ -599,6 +835,10 @@ class _$WorkflowFirebaseConfigCopyWithImpl<$Res,
       appIdIos: freezed == appIdIos
           ? _value.appIdIos
           : appIdIos // ignore: cast_nullable_to_non_nullable
+              as String?,
+      appIdAndroid: freezed == appIdAndroid
+          ? _value.appIdAndroid
+          : appIdAndroid // ignore: cast_nullable_to_non_nullable
               as String?,
       serviceAccountJson: freezed == serviceAccountJson
           ? _value.serviceAccountJson
@@ -629,6 +869,7 @@ abstract class _$$WorkflowFirebaseConfigImplCopyWith<$Res>
   $Res call(
       {AppDistributionConfig appDistribution,
       String? appIdIos,
+      String? appIdAndroid,
       String? serviceAccountJson});
 
   @override
@@ -650,6 +891,7 @@ class __$$WorkflowFirebaseConfigImplCopyWithImpl<$Res>
   $Res call({
     Object? appDistribution = null,
     Object? appIdIos = freezed,
+    Object? appIdAndroid = freezed,
     Object? serviceAccountJson = freezed,
   }) {
     return _then(_$WorkflowFirebaseConfigImpl(
@@ -660,6 +902,10 @@ class __$$WorkflowFirebaseConfigImplCopyWithImpl<$Res>
       appIdIos: freezed == appIdIos
           ? _value.appIdIos
           : appIdIos // ignore: cast_nullable_to_non_nullable
+              as String?,
+      appIdAndroid: freezed == appIdAndroid
+          ? _value.appIdAndroid
+          : appIdAndroid // ignore: cast_nullable_to_non_nullable
               as String?,
       serviceAccountJson: freezed == serviceAccountJson
           ? _value.serviceAccountJson
@@ -675,6 +921,7 @@ class _$WorkflowFirebaseConfigImpl implements _WorkflowFirebaseConfig {
   const _$WorkflowFirebaseConfigImpl(
       {required this.appDistribution,
       this.appIdIos = null,
+      this.appIdAndroid = null,
       this.serviceAccountJson = null});
 
   factory _$WorkflowFirebaseConfigImpl.fromJson(Map<String, dynamic> json) =>
@@ -687,11 +934,14 @@ class _$WorkflowFirebaseConfigImpl implements _WorkflowFirebaseConfig {
   final String? appIdIos;
   @override
   @JsonKey()
+  final String? appIdAndroid;
+  @override
+  @JsonKey()
   final String? serviceAccountJson;
 
   @override
   String toString() {
-    return 'WorkflowFirebaseConfig(appDistribution: $appDistribution, appIdIos: $appIdIos, serviceAccountJson: $serviceAccountJson)';
+    return 'WorkflowFirebaseConfig(appDistribution: $appDistribution, appIdIos: $appIdIos, appIdAndroid: $appIdAndroid, serviceAccountJson: $serviceAccountJson)';
   }
 
   @override
@@ -703,14 +953,16 @@ class _$WorkflowFirebaseConfigImpl implements _WorkflowFirebaseConfig {
                 other.appDistribution == appDistribution) &&
             (identical(other.appIdIos, appIdIos) ||
                 other.appIdIos == appIdIos) &&
+            (identical(other.appIdAndroid, appIdAndroid) ||
+                other.appIdAndroid == appIdAndroid) &&
             (identical(other.serviceAccountJson, serviceAccountJson) ||
                 other.serviceAccountJson == serviceAccountJson));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, appDistribution, appIdIos, serviceAccountJson);
+  int get hashCode => Object.hash(
+      runtimeType, appDistribution, appIdIos, appIdAndroid, serviceAccountJson);
 
   @JsonKey(ignore: true)
   @override
@@ -731,6 +983,7 @@ abstract class _WorkflowFirebaseConfig implements WorkflowFirebaseConfig {
   const factory _WorkflowFirebaseConfig(
       {required final AppDistributionConfig appDistribution,
       final String? appIdIos,
+      final String? appIdAndroid,
       final String? serviceAccountJson}) = _$WorkflowFirebaseConfigImpl;
 
   factory _WorkflowFirebaseConfig.fromJson(Map<String, dynamic> json) =
@@ -740,6 +993,8 @@ abstract class _WorkflowFirebaseConfig implements WorkflowFirebaseConfig {
   AppDistributionConfig get appDistribution;
   @override
   String? get appIdIos;
+  @override
+  String? get appIdAndroid;
   @override
   String? get serviceAccountJson;
   @override
