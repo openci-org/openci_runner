@@ -345,8 +345,8 @@ GithubChecks _$GithubChecksFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$GithubChecks {
-  int get issueNumber => throw _privateConstructorUsedError;
   int get checkRunId => throw _privateConstructorUsedError;
+  int? get issueNumber => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -360,7 +360,7 @@ abstract class $GithubChecksCopyWith<$Res> {
           GithubChecks value, $Res Function(GithubChecks) then) =
       _$GithubChecksCopyWithImpl<$Res, GithubChecks>;
   @useResult
-  $Res call({int issueNumber, int checkRunId});
+  $Res call({int checkRunId, int? issueNumber});
 }
 
 /// @nodoc
@@ -376,18 +376,18 @@ class _$GithubChecksCopyWithImpl<$Res, $Val extends GithubChecks>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? issueNumber = null,
     Object? checkRunId = null,
+    Object? issueNumber = freezed,
   }) {
     return _then(_value.copyWith(
-      issueNumber: null == issueNumber
-          ? _value.issueNumber
-          : issueNumber // ignore: cast_nullable_to_non_nullable
-              as int,
       checkRunId: null == checkRunId
           ? _value.checkRunId
           : checkRunId // ignore: cast_nullable_to_non_nullable
               as int,
+      issueNumber: freezed == issueNumber
+          ? _value.issueNumber
+          : issueNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
     ) as $Val);
   }
 }
@@ -400,7 +400,7 @@ abstract class _$$GithubChecksImplCopyWith<$Res>
       __$$GithubChecksImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int issueNumber, int checkRunId});
+  $Res call({int checkRunId, int? issueNumber});
 }
 
 /// @nodoc
@@ -414,18 +414,18 @@ class __$$GithubChecksImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? issueNumber = null,
     Object? checkRunId = null,
+    Object? issueNumber = freezed,
   }) {
     return _then(_$GithubChecksImpl(
-      issueNumber: null == issueNumber
-          ? _value.issueNumber
-          : issueNumber // ignore: cast_nullable_to_non_nullable
-              as int,
       checkRunId: null == checkRunId
           ? _value.checkRunId
           : checkRunId // ignore: cast_nullable_to_non_nullable
               as int,
+      issueNumber: freezed == issueNumber
+          ? _value.issueNumber
+          : issueNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -433,20 +433,20 @@ class __$$GithubChecksImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$GithubChecksImpl implements _GithubChecks {
-  const _$GithubChecksImpl(
-      {required this.issueNumber, required this.checkRunId});
+  const _$GithubChecksImpl({required this.checkRunId, this.issueNumber = null});
 
   factory _$GithubChecksImpl.fromJson(Map<String, dynamic> json) =>
       _$$GithubChecksImplFromJson(json);
 
   @override
-  final int issueNumber;
-  @override
   final int checkRunId;
+  @override
+  @JsonKey()
+  final int? issueNumber;
 
   @override
   String toString() {
-    return 'GithubChecks(issueNumber: $issueNumber, checkRunId: $checkRunId)';
+    return 'GithubChecks(checkRunId: $checkRunId, issueNumber: $issueNumber)';
   }
 
   @override
@@ -454,15 +454,15 @@ class _$GithubChecksImpl implements _GithubChecks {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$GithubChecksImpl &&
-            (identical(other.issueNumber, issueNumber) ||
-                other.issueNumber == issueNumber) &&
             (identical(other.checkRunId, checkRunId) ||
-                other.checkRunId == checkRunId));
+                other.checkRunId == checkRunId) &&
+            (identical(other.issueNumber, issueNumber) ||
+                other.issueNumber == issueNumber));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, issueNumber, checkRunId);
+  int get hashCode => Object.hash(runtimeType, checkRunId, issueNumber);
 
   @JsonKey(ignore: true)
   @override
@@ -480,16 +480,16 @@ class _$GithubChecksImpl implements _GithubChecks {
 
 abstract class _GithubChecks implements GithubChecks {
   const factory _GithubChecks(
-      {required final int issueNumber,
-      required final int checkRunId}) = _$GithubChecksImpl;
+      {required final int checkRunId,
+      final int? issueNumber}) = _$GithubChecksImpl;
 
   factory _GithubChecks.fromJson(Map<String, dynamic> json) =
       _$GithubChecksImpl.fromJson;
 
   @override
-  int get issueNumber;
-  @override
   int get checkRunId;
+  @override
+  int? get issueNumber;
   @override
   @JsonKey(ignore: true)
   _$$GithubChecksImplCopyWith<_$GithubChecksImpl> get copyWith =>

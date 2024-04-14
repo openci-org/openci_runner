@@ -160,7 +160,7 @@ pod install;
 source ~/.zshrc;
 cd ~/Downloads/$_appName;
 export SHOREBIRD_TOKEN=$shorebirdToken;
-shorebird patch ios -y -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist ${_generateDartDefines(dartDefines)}; 
+shorebird patch ios --allow-asset-diffs --allow-native-diffs -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist ${_generateDartDefines(dartDefines)}; 
 ''';
       default:
         throw Exception('Flavor must be specified');

@@ -32,8 +32,8 @@ class Branch with _$Branch {
 @freezed
 class GithubChecks with _$GithubChecks {
   const factory GithubChecks({
-    required int issueNumber,
     required int checkRunId,
+    @Default(null) int? issueNumber,
   }) = _GithubChecks;
 
   factory GithubChecks.fromJson(Map<String, dynamic> json) =>
