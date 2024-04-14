@@ -4,16 +4,13 @@ import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_runner/src/services/tart/tart_service.dart';
 
 class VMController {
-  VMController(this.workingVMName);
+  VMController(this.workingVMName, this._tartService);
   final String workingVMName;
+  final TartService _tartService;
   Logger logger = Logger();
-
-  static final _tartService = TartService();
 
   Future<void> get cloneVM async {
     const baseVMName = 'sonoma';
-
-    // TODO(someone): If baseVM does not exist, pull it from the internet.
     await _tartService.clone(baseVMName, workingVMName);
   }
 
@@ -50,7 +47,7 @@ class VMController {
 
   Future<String> get fetchIpAddress async {
     try {
-      final ip = await _tartService.ip(workingVMName);
+      final ip = await _tartService.getVMIp(workingVMName);
       final ipRegex =
           RegExp(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b'); // 正規表現でIPv4をマッチング
 

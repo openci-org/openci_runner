@@ -1,3 +1,9 @@
+## 0.7.0
+- auto reboot
+- faster build time
+- fix lots of bugs
+- refactor
+
 ## 0.6.8
 
 - close #124 
