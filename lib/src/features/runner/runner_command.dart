@@ -169,7 +169,7 @@ class RunnerCommand extends Command<int> {
             .where('buildStatus.processing', WhereFilter.equal, false)
             .where('buildStatus.success', WhereFilter.equal, false)
             .where('buildStatus.failure', WhereFilter.equal, false)
-            .orderBy('createdAt', descending: true)
+            .orderBy('createdAt', descending: false)
             .get();
 
         if (jobsQs.docs.isEmpty && progress != null) {
