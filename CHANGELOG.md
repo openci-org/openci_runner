@@ -1,3 +1,6 @@
+## 0.7.1
+- fix: logic of incrementing build number
+
 ## 0.7.0
 - auto reboot
 - faster build time
