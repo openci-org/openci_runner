@@ -221,6 +221,25 @@ class RunnerCommand extends Command<int> {
           buildJob.github.installationId,
         );
 
+        final organizationDocs = await firestore
+            .collection('organizations')
+            .doc(workflow.organizationId)
+            .get();
+        final organizationData = organizationDocs.data();
+        if (organizationData == null) {
+          throw Exception(
+            'organizationData is null: ${workflow.organizationId}',
+          );
+        }
+        final organization = OrganizationModel.fromJson(organizationData);
+
+        await buildUtilityService.incrementBuildNumber(
+          organization.documentId,
+          organization.buildNumber,
+          workflow.platform,
+        );
+        _logger.success('${workflow.platform} buildNumber update success');
+
         final vmId = UuidService.generateV4();
         final vm = VMController(vmId, tartService);
         await vm.cleanupVMs;
@@ -251,18 +270,6 @@ class RunnerCommand extends Command<int> {
         }
         final sshShellService = SSHShellService(sshService);
         final appName = buildJob.github.repositoryName;
-
-        final organizationDocs = await firestore
-            .collection('organizations')
-            .doc(workflow.organizationId)
-            .get();
-        final organizationData = organizationDocs.data();
-        if (organizationData == null) {
-          throw Exception(
-            'organizationData is null: ${workflow.organizationId}',
-          );
-        }
-        final organization = OrganizationModel.fromJson(organizationData);
 
         await buildUtilityService.cloneRepository(
           sshShellService,
@@ -470,12 +477,6 @@ class RunnerCommand extends Command<int> {
             }
           }
         }
-        await buildUtilityService.incrementBuildNumber(
-          organization.documentId,
-          organization.buildNumber,
-          workflow.platform,
-        );
-        _logger.success('${workflow.platform} buildNumber update success');
 
         await buildUtilityService.markJobAsSuccess(jobId);
         _logger.success('whole build process completed');
