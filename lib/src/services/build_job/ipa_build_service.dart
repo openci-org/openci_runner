@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:dartssh2/dartssh2.dart';
-import 'package:openci_runner/src/features/user/domain/user_data.dart';
 import 'package:openci_runner/src/services/build_job/build_common_commands.dart';
 import 'package:openci_runner/src/services/macos/directory_paths.dart';
 import 'package:openci_runner/src/services/shell/shell_result.dart';
@@ -119,17 +118,11 @@ pod install;
 
   Future<void> buildIpa(
     int iosBuildNumber,
-    Flavor flavor,
+    String flavor,
     List<String>? dartDefines,
   ) async {
-    var command = '';
-    switch (flavor) {
-      case Flavor.none:
-        command =
-            '${BuildCommonCommands.loadZshrc} && ${BuildCommonCommands.navigateToAppDirectory(_appName)} && flutter build ipa ${BuildCommonCommands.generateDartDefines(dartDefines)} --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist;';
-      default:
-        throw Exception('Flavor must be specified');
-    }
+    final command =
+        '${BuildCommonCommands.loadZshrc} && ${BuildCommonCommands.navigateToAppDirectory(_appName)} && flutter build ipa ${_flavorArgument(flavor)} ${BuildCommonCommands.generateDartDefines(dartDefines)} --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist;';
     await _sshShellService.executeCommand(
       command,
       _sshClient,
@@ -138,27 +131,30 @@ pod install;
     );
   }
 
+  String _flavorArgument(String flavor) {
+    var flavorArgument = '';
+    if (flavor != 'none') {
+      flavorArgument = '--flavor $flavor';
+    }
+    return flavorArgument;
+  }
+
   Future<ShellResult> patchShorebirdIpa(
     int iosBuildNumber,
-    Flavor flavor,
+    String flavor,
     String? shorebirdToken,
     List<String>? dartDefines,
   ) async {
     if (shorebirdToken == null) {
       throw Exception('Shorebird token is required');
     }
-    var command = '';
-    switch (flavor) {
-      case Flavor.none:
-        command = '''
+    final command = '''
 ${BuildCommonCommands.loadZshrc};
 ${BuildCommonCommands.navigateToAppDirectory(_appName)};
 export SHOREBIRD_TOKEN=$shorebirdToken;
-shorebird patch ios --allow-asset-diffs --allow-native-diffs -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist ${BuildCommonCommands.generateDartDefines(dartDefines)}; 
+export CI=true;
+shorebird patch ios ${_flavorArgument(flavor)} --allow-asset-diffs --allow-native-diffs -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist ${BuildCommonCommands.generateDartDefines(dartDefines)}; 
 ''';
-      default:
-        throw Exception('Flavor must be specified');
-    }
     return _sshShellService.executeCommand(
       command,
       _sshClient,
@@ -169,7 +165,7 @@ shorebird patch ios --allow-asset-diffs --allow-native-diffs -- --build-number=$
 
   Future<ShellResult> buildShorebirdIpa(
     int iosBuildNumber,
-    Flavor flavor,
+    String flavor,
     String? shorebirdToken,
     String flutterVersion,
     List<String>? dartDefines,
@@ -181,18 +177,12 @@ shorebird patch ios --allow-asset-diffs --allow-native-diffs -- --build-number=$
     if (int.parse(flutterVersion.replaceAll('.', '')) < 3195) {
       flutterVersionArgument = '';
     }
-    var command = '';
-    switch (flavor) {
-      case Flavor.none:
-        command = '''
+    final command = '''
 ${BuildCommonCommands.loadZshrc};
 ${BuildCommonCommands.navigateToAppDirectory(_appName)};
 export SHOREBIRD_TOKEN=$shorebirdToken;
-shorebird release ios $flutterVersionArgument -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist ${BuildCommonCommands.generateDartDefines(dartDefines)}; 
+shorebird release ios ${_flavorArgument(flavor)} $flutterVersionArgument -- --build-number=$iosBuildNumber --export-options-plist=ios/openCIexportOptions.plist ${BuildCommonCommands.generateDartDefines(dartDefines)}; 
 ''';
-      default:
-        throw Exception('Flavor must be specified');
-    }
     return _sshShellService.executeCommand(
       command,
       _sshClient,

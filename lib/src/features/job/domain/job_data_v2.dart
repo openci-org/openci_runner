@@ -1,5 +1,3 @@
-// Define the nested models
-
 import 'package:dart_firebase_admin/firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:openci_runner/src/features/job/domain/job_data.dart';

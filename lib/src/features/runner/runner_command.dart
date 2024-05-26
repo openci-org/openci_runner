@@ -169,7 +169,7 @@ class RunnerCommand extends Command<int> {
             .where('buildStatus.processing', WhereFilter.equal, false)
             .where('buildStatus.success', WhereFilter.equal, false)
             .where('buildStatus.failure', WhereFilter.equal, false)
-            .orderBy('createdAt', descending: false)
+            .orderBy('createdAt', descending: true)
             .get();
 
         if (jobsQs.docs.isEmpty && progress != null) {
@@ -319,10 +319,13 @@ class RunnerCommand extends Command<int> {
               workflow.shorebird.token,
               workflow.flutter.version,
               workflow.flutter.dartDefine,
+              workflow.flutter.flavor,
             );
           } else {
-            await aabBuildService
-                .buildAppBundle(organization.buildNumber.android);
+            await aabBuildService.buildAppBundle(
+              organization.buildNumber.android,
+              workflow.flutter.flavor,
+            );
           }
 
           final distribution = workflow.distribution;
@@ -378,21 +381,21 @@ class RunnerCommand extends Command<int> {
           );
           await ipaBuildService.importCertificates();
 
-          await ipaBuildService.getRubyScripts(
-            sshShellService,
-            sshClient,
-            jobId,
-            vm.workingVMName,
-          );
+          // await ipaBuildService.getRubyScripts(
+          //   sshShellService,
+          //   sshClient,
+          //   jobId,
+          //   vm.workingVMName,
+          // );
 
-          await ipaBuildService.setProvisioningProfile(
-            sshShellService,
-            sshClient,
-            jobId,
-            vm.workingVMName,
-            workflow.ios.teamId,
-            workflow.ios.provisioningProfile?.name,
-          );
+          // await ipaBuildService.setProvisioningProfile(
+          //   sshShellService,
+          //   sshClient,
+          //   jobId,
+          //   vm.workingVMName,
+          //   workflow.ios.teamId,
+          //   workflow.ios.provisioningProfile?.name,
+          // );
 
           await ipaBuildService.runCustomScripts();
 

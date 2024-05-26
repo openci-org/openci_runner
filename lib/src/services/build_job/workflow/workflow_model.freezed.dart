@@ -1653,7 +1653,7 @@ WorkflowFlutterConfig _$WorkflowFlutterConfigFromJson(
 
 /// @nodoc
 mixin _$WorkflowFlutterConfig {
-  Flavor get flavor => throw _privateConstructorUsedError;
+  String get flavor => throw _privateConstructorUsedError;
   String get version => throw _privateConstructorUsedError;
   List<String>? get dartDefine => throw _privateConstructorUsedError;
 
@@ -1669,7 +1669,7 @@ abstract class $WorkflowFlutterConfigCopyWith<$Res> {
           $Res Function(WorkflowFlutterConfig) then) =
       _$WorkflowFlutterConfigCopyWithImpl<$Res, WorkflowFlutterConfig>;
   @useResult
-  $Res call({Flavor flavor, String version, List<String>? dartDefine});
+  $Res call({String flavor, String version, List<String>? dartDefine});
 }
 
 /// @nodoc
@@ -1694,7 +1694,7 @@ class _$WorkflowFlutterConfigCopyWithImpl<$Res,
       flavor: null == flavor
           ? _value.flavor
           : flavor // ignore: cast_nullable_to_non_nullable
-              as Flavor,
+              as String,
       version: null == version
           ? _value.version
           : version // ignore: cast_nullable_to_non_nullable
@@ -1716,7 +1716,7 @@ abstract class _$$WorkflowFlutterConfigImplCopyWith<$Res>
       __$$WorkflowFlutterConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({Flavor flavor, String version, List<String>? dartDefine});
+  $Res call({String flavor, String version, List<String>? dartDefine});
 }
 
 /// @nodoc
@@ -1739,7 +1739,7 @@ class __$$WorkflowFlutterConfigImplCopyWithImpl<$Res>
       flavor: null == flavor
           ? _value.flavor
           : flavor // ignore: cast_nullable_to_non_nullable
-              as Flavor,
+              as String,
       version: null == version
           ? _value.version
           : version // ignore: cast_nullable_to_non_nullable
@@ -1765,7 +1765,7 @@ class _$WorkflowFlutterConfigImpl implements _WorkflowFlutterConfig {
       _$$WorkflowFlutterConfigImplFromJson(json);
 
   @override
-  final Flavor flavor;
+  final String flavor;
   @override
   final String version;
   final List<String>? _dartDefine;
@@ -1817,7 +1817,7 @@ class _$WorkflowFlutterConfigImpl implements _WorkflowFlutterConfig {
 
 abstract class _WorkflowFlutterConfig implements WorkflowFlutterConfig {
   const factory _WorkflowFlutterConfig(
-      {required final Flavor flavor,
+      {required final String flavor,
       required final String version,
       final List<String>? dartDefine}) = _$WorkflowFlutterConfigImpl;
 
@@ -1825,7 +1825,7 @@ abstract class _WorkflowFlutterConfig implements WorkflowFlutterConfig {
       _$WorkflowFlutterConfigImpl.fromJson;
 
   @override
-  Flavor get flavor;
+  String get flavor;
   @override
   String get version;
   @override

@@ -28,4 +28,31 @@ class GitHubService {
       );
     }
   }
+
+  Future<dynamic> updateChecks(
+    int appId,
+    String privateKey,
+    int installationId,
+  ) async {
+    const url = 'https://get-github-job-wvluvdjkzq-an.a.run.app/updateChecks';
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'appId': appId,
+        'privateKey': privateKey,
+        'installationId': installationId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      return data;
+    } else {
+      throw Exception(
+        'Failed to get installation token. Status code: ${response.statusCode}',
+      );
+    }
+  }
 }

@@ -1,3 +1,6 @@
+## 0.7.2
+- fix: Disable Shorebird support
+
 ## 0.7.1
 - fix: logic of incrementing build number
 

@@ -48,13 +48,21 @@ class AabBuildService {
     );
   }
 
-  Future<void> buildAppBundle(int buildNumber) async {
+  Future<void> buildAppBundle(int buildNumber, String flavor) async {
     await _sshShellService.executeCommand(
-      '${BuildCommonCommands.loadZshrc} && ${BuildCommonCommands.navigateToAppDirectory(_appName)} && $pathAndroidSDK && flutter build appbundle --build-number=$buildNumber;',
+      '${BuildCommonCommands.loadZshrc} && ${BuildCommonCommands.navigateToAppDirectory(_appName)} && $pathAndroidSDK && flutter build appbundle ${_flavorArgument(flavor)} --build-number=$buildNumber;',
       _sshClient,
       _jobId,
       _workingVMName,
     );
+  }
+
+  String _flavorArgument(String flavor) {
+    var flavorArgument = '';
+    if (flavor != 'none') {
+      flavorArgument = '--flavor $flavor';
+    }
+    return flavorArgument;
   }
 
   Future<void> buildShorebirdAppBundle(
@@ -62,6 +70,7 @@ class AabBuildService {
     String? shorebirdToken,
     String flutterVersion,
     List<String>? dartDefines,
+    String flavor,
   ) async {
     if (shorebirdToken == null) {
       throw Exception('Shorebird token is required');
@@ -76,7 +85,8 @@ ${BuildCommonCommands.loadZshrc};
 ${BuildCommonCommands.navigateToAppDirectory(_appName)};
 $pathAndroidSDK;
 export SHOREBIRD_TOKEN=$shorebirdToken;
-shorebird release android $flutterVersionArgument -- --build-number=$buildNumber ${BuildCommonCommands.generateDartDefines(dartDefines)}; 
+export CI=true;
+shorebird release android ${_flavorArgument(flavor)} $flutterVersionArgument -- --build-number=$buildNumber ${BuildCommonCommands.generateDartDefines(dartDefines)}; 
 
 ''',
       _sshClient,

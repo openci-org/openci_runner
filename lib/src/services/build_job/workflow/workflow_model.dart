@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:openci_runner/src/features/job/domain/job_data.dart';
-import 'package:openci_runner/src/features/user/domain/user_data.dart';
 
 part 'workflow_model.freezed.dart';
 part 'workflow_model.g.dart';
@@ -98,7 +97,7 @@ class WorkflowProvisioningProfileConfig
 @freezed
 class WorkflowFlutterConfig with _$WorkflowFlutterConfig {
   const factory WorkflowFlutterConfig({
-    required Flavor flavor,
+    required String flavor,
     required String version,
     @Default(null) List<String>? dartDefine,
   }) = _WorkflowFlutterConfig;
