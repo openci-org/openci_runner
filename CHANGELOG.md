@@ -1,3 +1,6 @@
+## 0.7.3
+- feat: update custom script for ios
+
 ## 0.7.2
 - fix: Disable Shorebird support
 

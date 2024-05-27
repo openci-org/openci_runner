@@ -105,6 +105,7 @@ ${BuildCommonCommands.loadZshrc};
 cd Downloads/$_appName;
 flutter pub get;
 cd ios;
+rm Podfile.lock;
 rm -rf Pods;
 pod --version;
 pod repo update;
