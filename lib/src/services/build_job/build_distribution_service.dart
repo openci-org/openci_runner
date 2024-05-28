@@ -51,7 +51,7 @@ firebase appdistribution:distribute "$path" --app "$firebaseAppId" --groups "${t
 
   Future<String> appBundlePath() async {
     final result = await _sshShellService.executeCommand(
-      'find "/Users/admin/Downloads/$_appName/build/app/outputs/bundle/release" -type f -name "*.aab"',
+      'find "/Users/admin/Downloads/$_appName/build/app/outputs/flutter-apk" -type f -name "*.apk"',
       _sshClient,
       _jobId,
       _workingVMName,

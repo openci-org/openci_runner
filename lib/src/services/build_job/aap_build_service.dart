@@ -48,9 +48,9 @@ class AabBuildService {
     );
   }
 
-  Future<void> buildAppBundle(int buildNumber, String flavor) async {
+  Future<void> buildApk(int buildNumber, String flavor) async {
     await _sshShellService.executeCommand(
-      '${BuildCommonCommands.loadZshrc} && ${BuildCommonCommands.navigateToAppDirectory(_appName)} && $pathAndroidSDK && flutter build appbundle ${_flavorArgument(flavor)} --build-number=$buildNumber;',
+      '${BuildCommonCommands.loadZshrc} && ${BuildCommonCommands.navigateToAppDirectory(_appName)} && $pathAndroidSDK && flutter clean && flutter pub get && flutter build apk ${_flavorArgument(flavor)} --build-number=$buildNumber;',
       _sshClient,
       _jobId,
       _workingVMName,

@@ -322,7 +322,7 @@ class RunnerCommand extends Command<int> {
               workflow.flutter.flavor,
             );
           } else {
-            await aabBuildService.buildAppBundle(
+            await aabBuildService.buildApk(
               organization.buildNumber.android,
               workflow.flutter.flavor,
             );

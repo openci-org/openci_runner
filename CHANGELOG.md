@@ -1,3 +1,6 @@
+## 0.7.4
+- Drop support of aab build temporarily
+
 ## 0.7.3
 - feat: update custom script for ios
 
