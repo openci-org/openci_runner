@@ -5,7 +5,6 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:dart_firebase_admin/dart_firebase_admin.dart';
 import 'package:dart_firebase_admin/firestore.dart';
-import 'package:get_it/get_it.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:openci_runner/src/features/job/domain/job_data.dart';
 import 'package:openci_runner/src/features/job/domain/job_data_v2.dart';
@@ -125,8 +124,6 @@ class RunnerCommand extends Command<int> {
 
   @override
   Future<int> run() async {
-    GetIt.instance.registerSingleton<Logger>(Logger());
-
     final appConfig = await initializeApp(argResults);
     _logger.success('Argument check passed.');
 
@@ -208,16 +205,11 @@ class RunnerCommand extends Command<int> {
         final tartService = TartService(localShellService);
         final vmService = VMService(tartService);
         final buildUtilityService = BuildUtilityService(firestore, vmService);
+        final github = GitHubService();
 
         await buildUtilityService.markBuildAsStarted(jobId);
 
-        final privateKeyFile = File(appConfig.pem);
-        final privateKey = await privateKeyFile.readAsString();
-        final githubService = GitHubService();
-
-        final tokenId = await githubService.getInstallationToken(
-          buildJob.github.appId,
-          privateKey,
+        final tokenId = await github.getInstallationToken(
           buildJob.github.installationId,
         );
 
@@ -232,13 +224,6 @@ class RunnerCommand extends Command<int> {
           );
         }
         final organization = OrganizationModel.fromJson(organizationData);
-
-        await buildUtilityService.incrementBuildNumber(
-          organization.documentId,
-          organization.buildNumber,
-          workflow.platform,
-        );
-        _logger.success('${workflow.platform} buildNumber update success');
 
         final vmId = UuidService.generateV4();
         final vm = VMController(vmId, tartService);
@@ -355,10 +340,8 @@ class RunnerCommand extends Command<int> {
               _logger.success('upload build success');
             case BuildDistributionChannel.testFlight:
             case BuildDistributionChannel.playStoreInternal:
-            //
             case BuildDistributionChannel.playStoreBeta:
             case null:
-            // TODO: Handle this case.
           }
         } else if (targetPlatform == TargetPlatform.ios) {
           final ipaBuildService = IpaBuildService(
@@ -480,6 +463,13 @@ class RunnerCommand extends Command<int> {
             }
           }
         }
+
+        await buildUtilityService.incrementBuildNumber(
+          organization.documentId,
+          organization.buildNumber,
+          workflow.platform,
+        );
+        _logger.success('${workflow.platform} buildNumber update success');
 
         await buildUtilityService.markJobAsSuccess(jobId);
         _logger.success('whole build process completed');

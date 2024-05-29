@@ -1,3 +1,8 @@
+## 0.7.5
+- refactor: remove get_it and unused packages
+- fix: stop using firestore trigger and start to use REST APIs written in Dart
+- fix: remove unused code
+
 ## 0.7.4
 - Drop support of aab build temporarily
 

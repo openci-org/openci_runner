@@ -7,8 +7,15 @@ import 'package:openci_runner/src/features/job/domain/job_data_v2.dart';
 import 'package:openci_runner/src/services/build_job/build_common_commands.dart';
 import 'package:openci_runner/src/services/build_job/organization/organization_model.dart';
 import 'package:openci_runner/src/services/firebase/firestore/firestore_path.dart';
+import 'package:openci_runner/src/services/github_service.dart';
 import 'package:openci_runner/src/services/shell/ssh_shell_service.dart';
 import 'package:openci_runner/src/services/vm_service.dart';
+
+enum ChecksStatus {
+  inProgress,
+  failure,
+  success,
+}
 
 class BuildUtilityService {
   BuildUtilityService(
@@ -17,6 +24,8 @@ class BuildUtilityService {
   );
   final Firestore _firestore;
   final VMService _vmService;
+
+  GitHubService get _gitHubService => GitHubService();
 
   Future<void> handleJobFailure(
     String jobDocumentId,
@@ -27,20 +36,26 @@ class BuildUtilityService {
   }
 
   Future<void> _markJobAsFailed(String jobDocumentId) async {
-    await _firestore
-        .collection(FirestorePath.jobsDomain)
-        .doc(jobDocumentId)
-        .update({
-      'buildStatus.failure': true,
+    await _gitHubService.updateChecksStatus({
+      'jobId': jobDocumentId,
+      'checksStatus': ChecksStatus.failure.name,
     });
   }
 
   Future<void> markBuildAsStarted(String jobDocumentId) async {
-    await _firestore
-        .collection(FirestorePath.jobsDomain)
-        .doc(jobDocumentId)
-        .update({
-      'buildStatus.processing': true,
+    print('processing');
+    await _gitHubService.updateChecksStatus({
+      'jobId': jobDocumentId,
+      'checksStatus': ChecksStatus.inProgress.name,
+    });
+  }
+
+  Future<void> markJobAsSuccess(
+    String jobDocumentId,
+  ) async {
+    await _gitHubService.updateChecksStatus({
+      'jobId': jobDocumentId,
+      'checksStatus': ChecksStatus.success.name,
     });
   }
 
@@ -95,17 +110,6 @@ class BuildUtilityService {
           'buildNumber.android': previousBuildNumber.android + 1,
         });
     }
-  }
-
-  Future<void> markJobAsSuccess(
-    String jobDocumentId,
-  ) async {
-    await _firestore
-        .collection(FirestorePath.jobsDomain)
-        .doc(jobDocumentId)
-        .update({
-      'buildStatus.success': true,
-    });
   }
 
   String get loadZshrc => 'source ~/.zshrc';
