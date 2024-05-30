@@ -207,11 +207,10 @@ class RunnerCommand extends Command<int> {
         final buildUtilityService = BuildUtilityService(firestore, vmService);
         final github = GitHubService();
 
-        await buildUtilityService.markBuildAsStarted(jobId);
-
         final tokenId = await github.getInstallationToken(
           buildJob.github.installationId,
         );
+        await buildUtilityService.markBuildAsStarted(jobId);
 
         final organizationDocs = await firestore
             .collection('organizations')
@@ -464,14 +463,13 @@ class RunnerCommand extends Command<int> {
           }
         }
 
+        await buildUtilityService.markJobAsSuccess(jobId);
         await buildUtilityService.incrementBuildNumber(
           organization.documentId,
           organization.buildNumber,
           workflow.platform,
         );
         _logger.success('${workflow.platform} buildNumber update success');
-
-        await buildUtilityService.markJobAsSuccess(jobId);
         _logger.success('whole build process completed');
 
         await vm.stopVM;
