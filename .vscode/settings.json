@@ -4,6 +4,7 @@
     "appbundle",
     "appdistribution",
     "dartssh",
+    "dotenv",
     "endtemplate",
     "googleapis",
     "iphoneos",

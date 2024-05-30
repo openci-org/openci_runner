@@ -17,3 +17,5 @@ coverage/
 service_account.json
 
 /scripts
+.env
+/build

@@ -23,6 +23,10 @@ dependencies:
   pub_updater: ^0.3.0
   sentry: ^7.18.0
   uuid: ^4.2.1
+  dart_frog: ^1.1.0
+  dotenv: ^4.2.0
+  dart_jsonwebtoken: ^2.14.0
+  github: ^9.24.0
 
 dev_dependencies:
   analyzer: ^6.4.1
