@@ -1,3 +1,6 @@
+## 0.7.6
+- update
+
 ## 0.7.5
 - refactor: remove get_it and unused packages
 - fix: stop using firestore trigger and start to use REST APIs written in Dart
