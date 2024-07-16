@@ -21,7 +21,7 @@ dependencies:
   mason_logger: ^0.2.5
   process_run: ^0.13.3
   pub_updater: ^0.3.0
-  sentry: ^7.18.0
+  sentry: ">=7.18.0 <9.0.0"
   uuid: ^4.2.1
   dart_frog: ^1.1.0
   dotenv: ^4.2.0
